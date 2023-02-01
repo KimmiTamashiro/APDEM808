@@ -2,9 +2,9 @@ project:
   type: book
 
 book:
-  title: "APDEM808"
+  title: "Capstone"
   author: "Jane Doe"
-  date: "2/1/2023"
+  date: "1/25/2023"
   chapters:
     - index.qmd
     - intro.qmd
