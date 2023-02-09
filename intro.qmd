@@ -1,8 +1,10 @@
 ---
 mainfont: serif;
+execute:
+  echo: false
+  warning: false
 ---
 
-<<<<<<< HEAD
 ```{r}
 library(dplyr)
 library(ggplot2)
@@ -36,6 +38,7 @@ library(ggplot2)
 library(maptools)
 library(maps)
 library(cowplot)
+library(FedData)
 ```
 
 ## Introduction
@@ -48,16 +51,20 @@ The complex results of past studies underscore the symbiotic nature of human int
 
 Scale considerations are a challenge in all spatial analyses, therefore it is not surprising that scale is listed as limitation listed in most spatial analyses of land use, pollution, and respiratory health. Huang and colleagues address the modifiable areal unit problem (MAUP) by analyzing the impacts of land use data at different buffer sizes to determine trends across different spatial units [-@huang2021]. They also select data from different regions that are representative of different environments and climates to determine if regional factors influence their air pollution models [@huang2021]. Their results suggest that land cover types have varying significance across spatial scales, concluding that air pollutant levels are primarily affected by regional land cover types [@huang2021, pp. 7]. This paper builds upon their approach by acknowledging the role that climate plays in air pollution distribution, mitigation, and proliferation. Separating U.S. land areas based on climate region will acknowledge the spillover effects of air pollution that may not be appropriately captured in analyses performed at local scales [@simon2015].
 
-This research uses U.S. age-adjusted mortality rates from respiratory diseases (defined as ICD-10 codes J00 - J99) as the respiratory health indicator. In Mueller and colleagues' literature analysis on greenspace and respiratory health research, they found that respiratory mortality had the most consistent positive evidence as compared to research measuring other health indicators, including asthma, lung function, hospital admissions, among other measures [@mueller2022, pp. 28]. USING THIS MEASUREMENT VARIABLE WILL DO SOMETHING...FINISH.
+This research uses U.S. age-adjusted mortality rates from respiratory diseases (defined as ICD-10 codes J00 - J99) as the respiratory health indicator. In Mueller and colleagues' literature analysis on greenspace and respiratory health research, they found that respiratory mortality had the most consistent positive evidence as compared to research measuring other health indicators, including asthma, lung function, hospital admissions, among other measures [@mueller2022, pp. 28]. Using mortality rates from respiratory diseases will capture acute and chronic conditions that can be impacted by instances of severe drops in air quality and more moderate yet sustained air quality issues.
 
 ## Data and Methods
 
-Data fall into four major categories: health, demographic, air pollution, and land use. However, since this is a spatial analysis, the common thread in all data sources is the spatial linkage. Spatial evaluation of air pollution's impact on health is considered on a regional level. Following the approach that Simon and colleagues took to evaluate ozone trends in the U.S., this analysis also uses NOAA climate regions in the analysis of air pollution [-@simon2015]. Evaluation of data on a regional scale lowers the model's sensitivity to factors such as wind, climate, and pollutants' chemical reactions with other molecules in the air that can cause the concentration of air pollution to change [@simon2015, pp 186, pp. 188]. To this end, four regions were selected for this CONTINUE.
+Data fall into four major categories: health, demographic, air pollution, and land use. However, since this is a spatial analysis, the common thread in all data sources is the spatial linkage. Spatial evaluation of air pollution's impact on health is considered on a regional level. Following the approach that Simon and colleagues take to evaluate ozone trends in the U.S., this analysis also uses NOAA climate regions in the analysis of air pollution [-@simon2015]. Evaluation of data on a regional scale lowers the model's sensitivity to factors such as wind, climate, and pollutants' chemical reactions with other molecules in the air that can cause the concentration of air pollution to change [@simon2015, pp 186, pp. 188]. To this end, five regions were selected for this research, which represent different climate areas and a wide variety of land cover types.
 
 ```{r}
+#| fig-width: 12
+#| fig-height: 12
+#| fig-cap: Figure 1; Annual summary of air quality metrics by monitoring site from 2014 - 2016
+
 readRenviron("~/.Renviron") ## my census api key thru PSU \## census_api_key("eaaf0e3dde825849338015707f07974203e9ae94",install = TRUE, overwrite = TRUE)
 
-v20<- load_variables(2020, "acs5", cache = TRUE)
+#v20<- load_variables(2020, "acs5", cache = TRUE)
 
 #export to csv #write.csv(v20, file = "R/outputs/var.csv")
 options(tigris_use_cache = TRUE)
@@ -70,7 +77,7 @@ acs <- get_acs(geography = "county" ,
                              tot_pov = "B17001_002"),
               year = 2016,
               geometry = TRUE)#income in past 12 mos below poverty level ,year =2016 ,geometry = TRUE)
-              
+
 #load air quality data
 airQ_14 <- read.csv('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/annual_conc_by_monitor_2014_v1.csv', header = TRUE, sep = ",", fill=TRUE)
 airQ_15 <- read.csv('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/annual_conc_by_monitor_2015_v1.csv', header = TRUE, sep = ",", fill=TRUE)
@@ -96,13 +103,14 @@ OV <- c('17','18','21','29','39','47','54') #Ohio Valley
 SE <- c('01','12','13','37','45','51')
 SW <-c('04','08','35','49')
 NW <-c('16','41','53')
+non_US <-c('02','15','60','66','69','72','78') #outside of continental US
 
 #State Outlines for when we map the results...
 options(tigris_class = "sf")
 sts<- tigris::states(cb=F, year = 2014 )
 sts<- st_boundary(sts)%>%
   st_transform(crs = 2163)%>%
-  filter(!STATEFP%in%c('02','15','60','66','69','72','78')) #exclude those outside of continental US
+  filter(!STATEFP%in%non_US)
 
 #plot data airq 2014 - 2016
 AirQ_plot1<-ggplot(acs)+geom_sf(data=sts, color="black")+
@@ -140,7 +148,13 @@ AirQ_plot2<-ggplot(acs)+geom_sf(data=sts, color="black")+
 cowplot::plot_grid(AirQ_plot1, AirQ_plot2)
 ```
 
+Figure 2 plots the 2015 annual PM 2.5 measures on different scales by region to better evaluate the measurement trends. The west region has the highest annual PM 2.5 readings in two monitors in particular. KEEP EXPLAINING.
+
 ```{r}
+#| fig-width: 10
+#| fig-height: 8
+#| fig-cap: Figure 2; Average Annual PM 2.5 by region. Regional P.M 2.5 levels plotted on different scales.
+
 #start prepping for region plots
 sts_NE<- sts%>%filter(STATEFP%in%NE) #exclude those outside of continental US
 
@@ -326,20 +340,22 @@ cowplot::plot_grid(NW_plot, NR_plot, NE_plot, W_plot, SW_plot, UM_plot, OV_plot,
 
 ```
 
-The Environmental Protection Agency (EPA) publishes extensive amounts of air quality data through their Air Data site. This research focuses on PM 2.5 and Ozone data. PM 2.5 is a measure of the ambient air pollution... EXPLAIN MORE. EPA's annual summaries of air quality metrics by monitoring site for the years 2014 through 2016 are used in this model. Location data on monitoring sites are included in the data set. NEED TO FIGURE OUT HOW TO CONNECT MONITORING LOCATION/DATA TO GEOGRAPHIC REGIONS. BUFFER SIZES? OR NEED TO CLEAN UP THE COUNTY DATA?
+The Environmental Protection Agency (EPA) publishes extensive amounts of air quality data through their Air Data site. This research focuses on PM 2.5 and Ozone data. PM 2.5 is a measure of the ambient air pollution... EXPLAIN MORE. EPA's annual summaries of air quality metrics by monitoring site for the years 2014 through 2016 are used in this model. Location data on monitoring sites are included in the data set. Spatial interpolation techniques are used to infer air pollution estimates for unobserved locations (see: [Introduction to spatial data analysis \| Data Science (stanford.edu)](https://datascience.stanford.edu/news/introduction-spatial-data-analysis)). MORE ABOUT THIS AND WRAP.
 
 Respiratory health is measured by age-adjusted mortality rates by county, accessed through the Center for Disease Control and Prevention's (CDC) WONDER database. The first data set extracted is all-age, all-cause age-adjusted mortality rate by county for the three-year period from 2014 through 2016. Data were further filtered based on primary reported cause of death based on the ICD-10 code range J00-J99, which encompasses respiratory disease (NOTATE data integrity as a limitation later). Finally, a third data set limited the respiratory disease age-adjusted mortality rates to the 65 and over population. \[ADD GRAPHS for age-adjusted mortality rates and explain.\]
 
 ```{r}
+#need to split cofips to two columns
 acs_dat <-acs %>%
   pivot_wider(names_from = "variable", values_from = c("estimate", "moe"))%>%
-  rename(cofips = GEOID)
-  #ADD A FILTER HERE BASED ON LAT TO EXCLUDE AK/HI
+  rename(cofips = GEOID)%>%
+  transform(STATEFP = substr(cofips, 1, 2))%>%
+  filter(!STATEFP%in%non_US) #exclude those outside of continental US
 
 #load mortality data
 AAMR_all <- read.table('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/All Underlying Cause Mortality Rates Ade Adjusted 2014 thru 2016.txt',header = TRUE, sep = "\t", fill=TRUE)
-AAMR_ICDI_all <- read.table('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/ICD I00 I99 Mortality Rates Age Adjusted All Age-2014 thru 2016.txt',header = TRUE, sep = "\t", fill=TRUE)
-AAMR_ICDI_65 <- read.table('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/ICD I00 I99 Mortality Rates Age Adjusted 65+ 2014 thru 2016.txt',header = TRUE, sep = "\t", fill=TRUE)
+AAMR_ICDI_all <- read.table('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/ICD J00 J99 Mortality Rates Age Adjusted All Age-2014 thru 2016.txt',header = TRUE, sep = "\t", fill=TRUE)
+AAMR_ICDI_65 <- read.table('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/ICD J00 J99 Mortality Rates Age Adjusted 65+ 2014 thru 2016.txt',header = TRUE, sep = "\t", fill=TRUE)
 
 
 CDC_data_prep1 <- full_join(AAMR_all,AAMR_ICDI_all, by = "County.Code")
@@ -395,7 +411,9 @@ prep1 <- cbind(merge3,is.na_replace_mean1, is.na_replace_mean2, is.na_replace_me
 options(tigris_class = "sf")
 sts<- tigris::states(cb=T, year = 2016 )
 sts<- st_boundary(sts)%>%
-  st_transform(crs = 2163)
+  st_transform(crs = 2163)%>%
+  filter(!STATEFP%in%non_US) #exclude those outside of continental US
+
 
 #plot data 2
 prep1%>%
@@ -404,7 +422,7 @@ prep1%>%
   scale_color_brewer("Blues")+
   scale_fill_brewer(palette = "Blues", na.value="grey50")+
   geom_sf(data=sts, color="black")+
-  ggtitle("Age-Adjusted Mortality Rate", subtitle = "ACE 5-year estimates, 2016 - 2020")
+  ggtitle("Age-Adjusted Mortality Rate", subtitle = "CDC, 2014 - 2016")
 
 #plot data 3
 prep1%>%
@@ -413,7 +431,7 @@ prep1%>%
   scale_color_brewer("Reds")+
   scale_fill_brewer(palette = "Reds", na.value="grey50")+
   geom_sf(data=sts, color="black")+
-  ggtitle("Age-Adjusted Mortality Rates - ICD XX to XX", subtitle = "ACE 5-year estimates, 2016 - 2020")
+  ggtitle("Age-Adjusted Mortality Rates - ICD J00 to J99", subtitle = "CDC, 2014 - 2016")
 
 #plot data 4
 prep1%>%
@@ -422,16 +440,7 @@ prep1%>%
   scale_color_brewer("Purples")+
   scale_fill_brewer(palette = "Purples", na.value="grey50")+
   geom_sf(data=sts, color="black")+
-  ggtitle("Age-Adjusted Mortality Rates 65+: ICD XX to XX", subtitle = "ACE 5-year estimates, 2016 - 2020")
-
-#plot data 5
-prep1%>%
-  mutate(AAMR_ICDI_65= cut(is.na_replace_mean3, breaks=quantile(is.na_replace_mean3, p=seq(0,1,length.out = 5), na.rm=T ), include.lowest=T ))%>%
-  ggplot()+geom_sf(aes(fill=AAMR_ICDI_65,color=NA))+
-  scale_color_brewer("Purples")+
-  scale_fill_brewer(palette = "Purples", na.value="grey50")+
-  geom_sf(data=sts, color="black")+
-  ggtitle("Age-Adjusted Mortality Rates 65+: ICD XX to XX", subtitle = "ACE 5-year estimates, 2016 - 2020")
+  ggtitle("Age-Adjusted Mortality Rates 65+: ICD J00 to J99", subtitle = "CDC, 2014 - 2016")
 
 ```
 
@@ -441,7 +450,104 @@ Demographic data are obtained from the U.S. Census Bureau's American Community S
 
 Land cover data used in this model are from the National Land Cover Database (NLCD). Data were downloaded from the Multi-Resolution Land Characteristics Consortium website and further manipulated in R to differentiate primary land cover characteristics by county and by National Ocean and Atmospheric Administration (NOAA)-defined climate regions.
 
-NEED TO SUMMARIZE BELOW... less explanatory?\-\-\-\-\-\-\-\-\-\-\-\-\--
+NEED TO SUMMARIZE BELOW... less explanatory?
+
+```{r}
+#load in map and locality data
+library(FedData)
+NLCD_W <-get_nlcd(
+  template = sts_W,
+  label = "West",
+  year = 2016,
+  dataset = c("landcover"),
+  landmass = "L48",
+  extraction.dir = paste0(tempdir(), "/FedData/"),
+  raster.options = c("COMPRESS=DEFLATE", "ZLEVEL=9"),
+  force.redo = FALSE
+  )
+
+#load the NLCD legend from FedData package
+legend<-pal_nlcd()
+
+#view coordinate reference system
+#NLCD@crs
+
+# plot the raster
+raster::plot(NLCD_W,
+     main="U.S. NLCD Land Cover: West, 2016") # add title with main
+
+#histogram
+W_hist<-hist(NLCD_W,
+     breaks=6,
+     main="Histogram Digital Surface Model\n NEON Harvard Forest Field Site",
+     col="wheat3",  # changes bin color
+     xlab= "Elevation (m)")  # label the x-axis
+
+# #load in map and locality data
+# NLCD_NW <-get_nlcd(
+#   template = sts_NW,
+#   label = "Northwest",
+#   year = 2016,
+#   dataset = c("landcover"),
+#   landmass = "L48",
+#   extraction.dir = paste0(tempdir(), "/FedData/"),
+#   raster.options = c("COMPRESS=DEFLATE", "ZLEVEL=9"),
+#   force.redo = FALSE
+#   )
+# 
+# # plot the raster
+# raster::plot(NLCD_NW, 
+#      main="U.S. NLCD Land Cover: Northwest, 2016") # add title with main
+# 
+# #load in map and locality data
+# NLCD_OV <-get_nlcd(
+#   template = sts_OV,
+#   label = "Ohio Valley Region",
+#   year = 2016,
+#   dataset = c("landcover"),
+#   landmass = "L48",
+#   extraction.dir = paste0(tempdir(), "/FedData/"),
+#   raster.options = c("COMPRESS=DEFLATE", "ZLEVEL=9"),
+#   force.redo = FALSE
+#   )
+# 
+# # plot the raster
+# raster::plot(NLCD_OV, 
+#      main="U.S. NLCD Land Cover: Ohio Valley Region, 2016") # add title with main
+# 
+# #load in map and locality data
+# NLCD_S <-get_nlcd(
+#   template = sts_S,
+#   label = "South",
+#   year = 2016,
+#   dataset = c("landcover"),
+#   landmass = "L48",
+#   extraction.dir = paste0(tempdir(), "/FedData/"),
+#   raster.options = c("COMPRESS=DEFLATE", "ZLEVEL=9"),
+#   force.redo = FALSE
+#   )
+# 
+# # plot the raster
+# raster::plot(NLCD_S, 
+#      main="U.S. NLCD Land Cover: South, 2016") # add title with main
+# 
+# #load in map and locality data
+# #NLCD_SE <-get_nlcd(
+# #  template = sts_SE,
+# #  label = "Southeast",
+# #  year = 2016,
+# #  dataset = c("landcover"),
+# #  landmass = "L48",
+# #  extraction.dir = paste0(tempdir(), "/FedData/"),
+# #  raster.options = c("COMPRESS=DEFLATE", "ZLEVEL=9"),
+# #  force.redo = FALSE
+# #  )
+# 
+# # plot the raster
+# #raster::plot(NLCD_SE, 
+# #     main="U.S. NLCD Land Cover: Southeast, 2016") # add title with main
+
+```
 
 The dependent variable that is being used as a proxy for health is age-adjusted mortality rate for respiratory diseases. After a review of the dependent and independent variables, OLS regression models are consulted. The OLS regression model will estimate the effect of the independent variables on the dependent variable.
 
@@ -449,19 +555,4 @@ Different combinations of variables are tested to evaluate what creates the best
 
 A linear regression model is then evaluated for spatial autocorrelation. The regression model depends on independence and heteroskedasticity of residuals. If spatial autocorrelation is present, then both rules are broken. Spatial autocorrelation is tested using the Global Moran's I test, followed by mapping the Local Moran's I. Spatial clustering is revealed by the Local Indicator of Spatial Association (LISA) map. The Lagrange Multiplier test is consulted to determine if spatial error or spatial lag is driving spatial autocorrelation in the model. Based on the Lagrange Multiplier results, the spatial lag model is used to try to produce a better model. GWR model?
 
-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\--
-=======
-## Introduction
-
-Air pollution's adverse impact on respiratory health is a widely known issue. The World Health Organization acknowledged the significance of this risk factor in its 68th conference, where they note that "exposure to air pollutants, including fine particulate matter, is a leading risk factor for noncommunicable diseases in adults, including ischaemic heart disease, stroke, chronic obstructive pulmonary disease, asthma and cancer, and poses a considerable health threat to current and future generations," [-@worldhealthassembly2015]. Further, numerous studies have substantiated the risk that air pollution poses to population health, many linking air pollution to industrial areas and urbanization. On the other hand, other research recognize the variable impacts of interactions between urban built environments, air pollution, and health. This group of research considers factors ranging from the built environment's impact on promoting walking and other forms of exercise, to the impact of exercising in areas with high levels of air pollution, and to the role that urban greenspace plays in reducing air pollution [@hankey2012], [@lee2022],[@alcock2017]. The study of air pollution's impact of respiratory health is complicated by the interactions between the natural environment, built environment, and human behavior. Therefore, approaching the problem using spatial methods may reveal prevailing patterns that result from the exchanges between all factors. This paper attempts to create a spatial model that predicts respiratory health patterns using air pollution and land cover data in the United States. By incorporating land cover data, I attempt to consider human interactions with the natural and built environment, and its impact on respiratory health, through direct or indirect means.
-
-Associations between land use and health impacts have also been studied in the past, with varying findings. Wang and colleagues found a negative correlation between Chronic Obstructive Pulmonary Disease (COPD) mortality and land use mix in most neighborhoods in China's Jing'an district except for northwest areas. In northwest neighborhoods, COPD mortality was positively correlated with land use mix [@wang2019 pp.7]. Other studies, such as Alcock and colleagues' analysis of asthma hospitalizations in the UK, find that increases in urban green space and tree density are associated with reductions in asthma hospitalizations [@alcock2017,pp.39]. However, models that included air pollutant exposure variables complicated this correlation [@alcock2017,pp.39]. Another study that analyzes variation in spatial distribution of lung cancer incidence rates in Shanghai, China found that industrial parks and urban-rural mixed areas show higher risk of lung cancer [@wang2022, pp.13]. Wang and colleagues also postulate that high lung cancer rates in high-density urban areas away from industrial pollution exposures may be due to traffic and other pollutants [-@wang2022, pp.13].
-
-The complex results of past studies underscore the symbiotic nature of human interactions with the built environment, and the downstream implications on individuals' health status. Wang and colleagues explained the changes in relationship between land use mix and COPD mortality by linking the existence of arterial roadways, which may increase opportunities for generation of air pollutants and negatively impact health, to their use to improve access to care [-@wang2019]. The shift in balance between the two factors, they say, is why results varied in highly urban areas as compared to highly rural regions [@wang2019, pp. 8]. Kim and colleagues also address the dichotomy of the urban environment's impact on traffic, air pollution and behavior by considering walkability and land use diversity in their model of the association between the built environment and asthma in Los Angeles, California [-@kim2023]. Their model builds upon urban planning ideas that mixed-use land reduces motorized travel through promotion of ride-sharing, walking, and shortened distances to destinations, while also promoting better physical through dedicated open spaces and recreational areas [@kim2023, pp. 58]. One limitation of Kim and colleagues' model is the limited spatial scope. In this paper, I build upon elements of Kim and colleagues' model but incorporate other scale considerations.
-
-Scale considerations are a challenge in all spatial analyses, therefore it is not surprising that scale is listed as limitation listed in most spatial analyses of land use, pollution, and respiratory health. Huang and colleagues address the modifiable areal unit problem (MAUP) by analyzing the impacts of land use data at different buffer sizes to determine trends across different spatial units [-@huang2021]. They also select data from different regions that are representative of different environments and climates to determine if regional factors influence their air pollution models [@huang2021]. Their results suggest that land cover types have varying significance across spatial scales, concluding that air pollutant levels are primarily affected by regional land cover types [@huang2021, pp. 7]. This paper builds upon their approach by acknowledging the role that climate plays in air pollution distribution, mitigation, and proliferation. Separating U.S. land areas based on climate region will acknowledge the spillover effects of air pollution that may not be appropriately captured in analyses performed at local scales [@simon2015].
-
-This research uses U.S. age-adjusted mortality rates from respiratory diseases (defined as ICD-10 codes J00 - J99) as the respiratory health indicator. In Mueller and colleagues' literature analysis on greenspace and respiratory health research, they found that respiratory mortality had the most consistent positive evidence as compared to research measuring other health indicators, including asthma, lung function, hospital admissions, among other measures [@mueller2022, pp. 28]. USING THIS MEASUREMENT VARIABLE WILL DO SOMETHING.
-
-## Data and Methods
->>>>>>> 713095ed37ca9ae8e22409974c799b9b43242df8
+------------------------------------------------------------------------
