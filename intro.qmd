@@ -3,6 +3,7 @@ mainfont: serif;
 execute:
   echo: false
   warning: false
+  freeze: true
 ---
 
 ```{r}
@@ -39,6 +40,8 @@ library(maptools)
 library(maps)
 library(cowplot)
 library(FedData)
+library(rasterVis)
+library(readxl)
 ```
 
 ## Introduction
@@ -58,11 +61,11 @@ This research uses U.S. age-adjusted mortality rates from respiratory diseases (
 Data fall into four major categories: health, demographic, air pollution, and land use. However, since this is a spatial analysis, the common thread in all data sources is the spatial linkage. Spatial evaluation of air pollution's impact on health is considered on a regional level. Following the approach that Simon and colleagues take to evaluate ozone trends in the U.S., this analysis also uses NOAA climate regions in the analysis of air pollution [-@simon2015]. Evaluation of data on a regional scale lowers the model's sensitivity to factors such as wind, climate, and pollutants' chemical reactions with other molecules in the air that can cause the concentration of air pollution to change [@simon2015, pp 186, pp. 188]. To this end, five regions were selected for this research, which represent different climate areas and a wide variety of land cover types.
 
 ```{r}
-#| fig-width: 12
-#| fig-height: 12
+#| fig-width: 15
+#| fig-height: 10
 #| fig-cap: Figure 1; Annual summary of air quality metrics by monitoring site from 2014 - 2016
 
-readRenviron("~/.Renviron") ## my census api key thru PSU \## census_api_key("eaaf0e3dde825849338015707f07974203e9ae94",install = TRUE, overwrite = TRUE)
+readRenviron("~/.Renviron") ## my census api key thru PSU census_api_key("eaaf0e3dde825849338015707f07974203e9ae94",install = TRUE, overwrite = TRUE)
 
 #v20<- load_variables(2020, "acs5", cache = TRUE)
 
@@ -79,19 +82,12 @@ acs <- get_acs(geography = "county" ,
               geometry = TRUE)#income in past 12 mos below poverty level ,year =2016 ,geometry = TRUE)
 
 #load air quality data
-airQ_14 <- read.csv('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/annual_conc_by_monitor_2014_v1.csv', header = TRUE, sep = ",", fill=TRUE)
-airQ_15 <- read.csv('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/annual_conc_by_monitor_2015_v1.csv', header = TRUE, sep = ",", fill=TRUE)
-airQ_16 <- read.csv('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/annual_conc_by_monitor_2016_v1.csv', header = TRUE, sep = ",", fill=TRUE)
+#airQ_14 <- read.csv('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/annual_conc_by_monitor_2014_v1.csv', header = TRUE, sep = ",", fill=TRUE)
+airQ_15_PM <- read.csv('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/annual_conc_by_monitor_2015_v1.csv', header = TRUE, sep = ",", fill=TRUE)
+airQ_15_O <- read.csv('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/annual_conc_by_monitor_2015_v2.csv', header = TRUE, sep = ",", fill=TRUE)
+#airQ_16 <- read.csv('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/annual_conc_by_monitor_2016_v1.csv', header = TRUE, sep = ",", fill=TRUE)
 airQ_all <- read.csv('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/annual_conc_by_monitor_3yr.csv', header = TRUE, sep = ",", fill=TRUE)
-
-#add leading zeroes to state and county
-airQ_vec_c <- airQ_all%>% pull(County.Code)
-co_vec_airQ <-sprintf("%02d",as.numeric(airQ_vec_c))
-airQ_vec_s <- airQ_all%>% pull(State.Code)
-st_vec_airQ <-sprintf("%02d",as.numeric(airQ_vec_s))
-
-airQ_prep1 <-cbind(st_vec_airQ,co_vec_airQ,airQ_all)
-airQ_prep2 <-airQ_prep1[,-c(3,4)]
+airQ_county <- read.csv('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/conreport2015.csv', header = TRUE, sep = ",", fill=TRUE)
 
 # Code Climate Regions by state per NOAA
 NE <- c('09','10','11','23','24','25','33','36','42','44','50','34')
@@ -105,44 +101,48 @@ SW <-c('04','08','35','49')
 NW <-c('16','41','53')
 non_US <-c('02','15','60','66','69','72','78') #outside of continental US
 
+#turn this into a data table
+STATEFP<-c('09','10','11','23','24','25','33','36','42','44','50','34','30','31','38','46','56','06','32','19','26','27','55','05','20','22','28','40','48','17','18','21','29','39','47','54','01','12','13','37','45','51','04','08','35','49','16','41','53','02','15','60','66','69','72','78')
+reg_names<-c('NE','NE','NE','NE','NE','NE','NE','NE','NE','NE','NE','NE','NR','NR','NR','NR','NR','W','W','UM','UM','UM','UM','S','S','S','S','S','S','OV','OV','OV','OV','OV','OV','OV','SE','SE','SE','SE','SE','SE','SW','SW','SW','SW','NW','NW','NW','non_US','non_US','non_US','non_US','non_US','non_US','non_US')
+
+regions<-data.frame(STATEFP,reg_names)
+
 #State Outlines for when we map the results...
 options(tigris_class = "sf")
-sts<- tigris::states(cb=F, year = 2014 )
+sts<- tigris::states(cb=F, year = 2015)
 sts<- st_boundary(sts)%>%
   st_transform(crs = 2163)%>%
   filter(!STATEFP%in%non_US)
 
-#plot data airq 2014 - 2016
+#plot data airq 2015
 AirQ_plot1<-ggplot(acs)+geom_sf(data=sts, color="black")+
-  geom_point(data=airQ_all,
+  geom_point(data=airQ_15_PM,
              aes(x = Longitude, y = Latitude),
              fill = "transparent",
              colour = "black",
              size = .75)+
-  geom_point(data = airQ_all,
+  geom_point(data = airQ_15_PM,
              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
               size = 0.25)+
-  scale_color_gradient(low = "green", 
+  scale_color_gradient(low = "blue", 
                        high = "red",
-                       name = 'Mean PM 2.5')+
-  facet_wrap(. ~ Year, nrow = 3) +
-  ggtitle("Annual Average PM2.5 Levels by Monitor", subtitle = "U.S. EPA, 2014 - 2016")
+                       name = 'Mean PM 2.5 Lvl')+
+  ggtitle("Annual Avg: PM2.5 Levels by Monitor", subtitle = "U.S. EPA, 2015")
 
-#plot data airq 2014 - 2016 98th percentile
+#plot data airq 2015 Daily 8 hour avg ozone reading
 AirQ_plot2<-ggplot(acs)+geom_sf(data=sts, color="black")+
-  geom_point(data=airQ_all,
+  geom_point(data=airQ_15_O,
              aes(x = Longitude, y = Latitude),
              fill = "transparent",
              colour = "black",
              size = .75)+
-  geom_point(data = airQ_all,
-             aes(x = Longitude, y = Latitude, colour = X98th.Percentile),
+  geom_point(data = airQ_15_O,
+             aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
              size = 0.25)+
-  scale_color_gradient(low = "green", 
+  scale_color_gradient(low = "blue", 
                        high = "red",
-                       name = 'Mean PM 2.5')+
-  facet_wrap(. ~ Year, nrow = 3) +
-  ggtitle("PM2.5 Level under which 98% of Days are Below by Monitor", subtitle = "U.S. EPA, 2014 - 2016")
+                       name = 'Mean Ozone')+
+  ggtitle("Annual Avg: Daily 8-Hour Avg Ozone", subtitle = "U.S. EPA, 2015")
 
 #print together
 cowplot::plot_grid(AirQ_plot1, AirQ_plot2)
@@ -155,13 +155,21 @@ Figure 2 plots the 2015 annual PM 2.5 measures on different scales by region to 
 #| fig-height: 8
 #| fig-cap: Figure 2; Average Annual PM 2.5 by region. Regional P.M 2.5 levels plotted on different scales.
 
+#add leading zeroes to state and county
+airQ_vec_c <- airQ_15_PM%>% pull(County.Code)
+co_vec_airQ <-sprintf("%02d",as.numeric(airQ_vec_c))
+airQ_vec_s <- airQ_15_PM%>% pull(State.Code)
+st_vec_airQ <-sprintf("%02d",as.numeric(airQ_vec_s))
+
+airQ_prep1 <-cbind(st_vec_airQ,co_vec_airQ,airQ_15_PM)
+airQ_prep2 <-airQ_prep1[,-c(3,4)]
+
 #start prepping for region plots
 sts_NE<- sts%>%filter(STATEFP%in%NE) #exclude those outside of continental US
 
 #plot data airq 2015
 NE_dat<-airQ_prep2%>%
-  filter(st_vec_airQ%in%NE)%>%
-  filter(Year%in%2015)
+  filter(st_vec_airQ%in%NE)
 
 NE_plot<-ggplot(acs)+geom_sf(data=sts_NE, color="black")+
   geom_point(data=NE_dat,
@@ -172,7 +180,9 @@ NE_plot<-ggplot(acs)+geom_sf(data=sts_NE, color="black")+
   geom_point(data = NE_dat,
              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
              size = 1.25)+
-  scale_color_gradient(low = "green", high = "red", name = 'Mean 2.5')+
+  scale_color_gradient(low = "blue", high = "red", name = 'PM2.5')+
+  labs(x=NULL, y=NULL) +
+  guides(x="none",y="none") +
   ggtitle("Air Quality: Northeast", subtitle = "U.S. EPA, 2015")
 
 #start prepping for region plots
@@ -180,8 +190,7 @@ sts_NR<- sts%>%filter(STATEFP%in%NR) #exclude those outside of continental US
 
 #plot data airq 2015
 NR_dat<-airQ_prep2%>%
-  filter(st_vec_airQ%in%NR)%>%
-  filter(Year%in%2015)
+  filter(st_vec_airQ%in%NR)
 
 NR_plot<-ggplot(acs)+geom_sf(data=sts_NR, color="black")+
   geom_point(data=NR_dat,
@@ -192,7 +201,9 @@ NR_plot<-ggplot(acs)+geom_sf(data=sts_NR, color="black")+
   geom_point(data = NR_dat,
              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
              size = 1.25)+
-  scale_color_gradient(low = "green", high = "red", name = 'Mean 2.5')+
+  scale_color_gradient(low = "blue", high = "red", name = 'PM2.5')+
+  labs(x=NULL, y=NULL) +
+  guides(x="none",y="none") +
   ggtitle("Air Quality: Northern Rockies", subtitle = "U.S. EPA, 2015")
 
 #start prepping for region plots
@@ -200,8 +211,7 @@ sts_W<- sts%>%filter(STATEFP%in%W) #exclude those outside of continental US
 
 #plot data airq 2015
 W_dat<-airQ_prep2%>%
-  filter(st_vec_airQ%in%W)%>%
-  filter(Year%in%2015)
+  filter(st_vec_airQ%in%W)
 
 W_plot<-ggplot(acs)+geom_sf(data=sts_W, color="black")+
   geom_point(data=W_dat,
@@ -212,7 +222,9 @@ W_plot<-ggplot(acs)+geom_sf(data=sts_W, color="black")+
   geom_point(data = W_dat,
              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
              size = 1.25)+
-  scale_color_gradient(low = "green", high = "red", name = 'Mean 2.5')+
+  scale_color_gradient(low = "blue", high = "red", name = 'PM2.5')+
+  labs(x=NULL, y=NULL) +
+  guides(x="none",y="none") +
   ggtitle("Air Quality: West", subtitle = "U.S. EPA, 2015")
 
 #start prepping for region plots
@@ -220,8 +232,7 @@ sts_UM<- sts%>%filter(STATEFP%in%UM) #exclude those outside of continental US
 
 #plot data airq 2015
 UM_dat<-airQ_prep2%>%
-  filter(st_vec_airQ%in%UM)%>%
-  filter(Year%in%2015)
+  filter(st_vec_airQ%in%UM)
 
 UM_plot<-ggplot(acs)+geom_sf(data=sts_UM, color="black")+
   geom_point(data=UM_dat,
@@ -232,7 +243,9 @@ UM_plot<-ggplot(acs)+geom_sf(data=sts_UM, color="black")+
   geom_point(data = UM_dat,
              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
              size = 1.25)+
-  scale_color_gradient(low = "green", high = "red", name = 'Mean 2.5')+
+  scale_color_gradient(low = "blue", high = "red", name = 'PM2.5')+
+  labs(x=NULL, y=NULL) +
+  guides(x="none",y="none") +
   ggtitle("Air Quality: Upper Midwest", subtitle = "U.S. EPA, 2015")
 
 #start prepping for region plots
@@ -240,8 +253,7 @@ sts_OV<- sts%>%filter(STATEFP%in%OV) #exclude those outside of continental US
 
 #plot data airq 2015
 OV_dat<-airQ_prep2%>%
-  filter(st_vec_airQ%in%OV)%>%
-  filter(Year%in%2015)
+  filter(st_vec_airQ%in%OV)
 
 OV_plot<-ggplot(acs)+geom_sf(data=sts_OV, color="black")+
   geom_point(data=OV_dat,
@@ -252,7 +264,9 @@ OV_plot<-ggplot(acs)+geom_sf(data=sts_OV, color="black")+
   geom_point(data = OV_dat,
              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
              size = 1.25)+
-  scale_color_gradient(low = "green", high = "red", name = 'Mean 2.5')+
+  scale_color_gradient(low = "blue", high = "red", name = 'PM2.5')+
+  labs(x=NULL, y=NULL) +
+  guides(x="none",y="none") +
   ggtitle("Air Quality: Ohio Valley", subtitle = "U.S. EPA, 2015")
 
 #start prepping for region plots
@@ -260,8 +274,7 @@ sts_S<- sts%>%filter(STATEFP%in%S) #exclude those outside of continental US
 
 #plot data airq 2015
 S_dat<-airQ_prep2%>%
-  filter(st_vec_airQ%in%S)%>%
-  filter(Year%in%2015)
+  filter(st_vec_airQ%in%S)
 
 S_plot<-ggplot(acs)+geom_sf(data=sts_S, color="black")+
   geom_point(data=S_dat,
@@ -272,7 +285,9 @@ S_plot<-ggplot(acs)+geom_sf(data=sts_S, color="black")+
   geom_point(data = S_dat,
              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
              size = 1.25)+
-  scale_color_gradient(low = "green", high = "red", name = 'Mean 2.5')+
+  scale_color_gradient(low = "blue", high = "red", name = 'PM2.5')+
+  labs(x=NULL, y=NULL) +
+  guides(x="none",y="none") +
   ggtitle("Air Quality: South", subtitle = "U.S. EPA, 2015")
 
 #start prepping for region plots
@@ -280,8 +295,7 @@ sts_SE<- sts%>%filter(STATEFP%in%SE) #exclude those outside of continental US
 
 #plot data airq 2015
 SE_dat<-airQ_prep2%>%
-  filter(st_vec_airQ%in%SE)%>%
-  filter(Year%in%2015)
+  filter(st_vec_airQ%in%SE)
 
 SE_plot<-ggplot(acs)+geom_sf(data=sts_SE, color="black")+
   geom_point(data=SE_dat,
@@ -292,7 +306,9 @@ SE_plot<-ggplot(acs)+geom_sf(data=sts_SE, color="black")+
   geom_point(data = SE_dat,
              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
              size = 1.25)+
-  scale_color_gradient(low = "green", high = "red", name = 'Mean 2.5')+
+  scale_color_gradient(low = "blue", high = "red", name = 'PM2.5')+
+  labs(x=NULL, y=NULL) +
+  guides(x="none",y="none") +
   ggtitle("Air Quality: Southeast", subtitle = "U.S. EPA, 2015")
 
 #start prepping for region plots
@@ -300,8 +316,7 @@ sts_SW<- sts%>%filter(STATEFP%in%SW) #exclude those outside of continental US
 
 #plot data airq 2015
 SW_dat<-airQ_prep2%>%
-  filter(st_vec_airQ%in%SW)%>%
-  filter(Year%in%2015)
+  filter(st_vec_airQ%in%SW)
 
 SW_plot<-ggplot(acs)+geom_sf(data=sts_SW, color="black")+
   geom_point(data=SW_dat,
@@ -312,7 +327,9 @@ SW_plot<-ggplot(acs)+geom_sf(data=sts_SW, color="black")+
   geom_point(data = SW_dat,
              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
              size = 1.25)+
-  scale_color_gradient(low = "green", high = "red", name = 'Mean 2.5')+
+  scale_color_gradient(low = "blue", high = "red", name = 'PM2.5')+
+  labs(x=NULL, y=NULL) +
+  guides(x="none",y="none") +
   ggtitle("Air Quality: Southwest", subtitle = "U.S. EPA, 2015")
 
 #start prepping for region plots
@@ -320,8 +337,7 @@ sts_NW<- sts%>%filter(STATEFP%in%NW) #exclude those outside of continental US
 
 #plot data airq 2015
 NW_dat<-airQ_prep2%>%
-  filter(st_vec_airQ%in%NW)%>%
-  filter(Year%in%2015)
+  filter(st_vec_airQ%in%NW)
 
 NW_plot<-ggplot(acs)+geom_sf(data=sts_NW, color="black")+
   geom_point(data=NW_dat,
@@ -332,7 +348,9 @@ NW_plot<-ggplot(acs)+geom_sf(data=sts_NW, color="black")+
   geom_point(data = NW_dat,
              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
              size = 1.25)+
-  scale_color_gradient(low = "green", high = "red", name = 'Mean 2.5')+
+  scale_color_gradient(low = "blue", high = "red", name = 'PM2.5')+
+  labs(x=NULL, y=NULL) +
+  guides(x="none",y="none") +
   ggtitle("Air Quality: Northwest", subtitle = "U.S. EPA, 2015")
 
 #map all 2015 Air Quality data
@@ -340,12 +358,12 @@ cowplot::plot_grid(NW_plot, NR_plot, NE_plot, W_plot, SW_plot, UM_plot, OV_plot,
 
 ```
 
-The Environmental Protection Agency (EPA) publishes extensive amounts of air quality data through their Air Data site. This research focuses on PM 2.5 and Ozone data. PM 2.5 is a measure of the ambient air pollution... EXPLAIN MORE. EPA's annual summaries of air quality metrics by monitoring site for the years 2014 through 2016 are used in this model. Location data on monitoring sites are included in the data set. Spatial interpolation techniques are used to infer air pollution estimates for unobserved locations (see: [Introduction to spatial data analysis \| Data Science (stanford.edu)](https://datascience.stanford.edu/news/introduction-spatial-data-analysis)). MORE ABOUT THIS AND WRAP.
-
-Respiratory health is measured by age-adjusted mortality rates by county, accessed through the Center for Disease Control and Prevention's (CDC) WONDER database. The first data set extracted is all-age, all-cause age-adjusted mortality rate by county for the three-year period from 2014 through 2016. Data were further filtered based on primary reported cause of death based on the ICD-10 code range J00-J99, which encompasses respiratory disease (NOTATE data integrity as a limitation later). Finally, a third data set limited the respiratory disease age-adjusted mortality rates to the 65 and over population. \[ADD GRAPHS for age-adjusted mortality rates and explain.\]
-
 ```{r}
-#need to split cofips to two columns
+#| fig-width: 10
+#| fig-height: 6
+#| fig-cap: Figure 3; County-level air pollution statistics. Region selection limited by availability of data
+
+#split cofips to two columns
 acs_dat <-acs %>%
   pivot_wider(names_from = "variable", values_from = c("estimate", "moe"))%>%
   rename(cofips = GEOID)%>%
@@ -405,7 +423,25 @@ is.na_replace_mean3[is.na(is.na_replace_mean3)] <- x_num_mean3
 
 #merge with data table
 prep1 <- cbind(merge3,is.na_replace_mean1, is.na_replace_mean2, is.na_replace_mean3)
-#prep2 <- subset(prep1,select = c(is.na_replace_mean, geometry)) continue cleaning later...
+
+#prep county airQ data; add leading zeroes to state and county
+airQ_vec_c <- airQ_county%>% pull(County.Code)
+co_vec_airQ <-sprintf("%05d",as.numeric(airQ_vec_c))
+
+airQ_c_prep1 <-cbind(co_vec_airQ,airQ_county)
+airQ_c_prep2 <-airQ_c_prep1[,-c(2)]%>%
+  rename(cofips=co_vec_airQ)%>%
+  mutate(across(c(CO.2nd.Max.1.hr:Lead.Max.3.Mo.Avg), na_if, '.'))
+
+#convert target col values from character to numeric
+cols.num <- c("PM2.5.Weighted.Mean.24.hr","Ozone.2nd.Max.1.hr")
+airQ_c_prep2[cols.num] <- sapply(airQ_c_prep2[cols.num],as.numeric)
+
+#join to the rest of county level data
+c_prep1 <- left_join(prep1,airQ_c_prep2, by="cofips")
+c_prep2 <- subset(c_prep1,select = -c(8:12,14,24))
+
+#map pollution indicators
 
 #State Outlines for when we map the results...
 options(tigris_class = "sf")
@@ -414,34 +450,60 @@ sts<- st_boundary(sts)%>%
   st_transform(crs = 2163)%>%
   filter(!STATEFP%in%non_US) #exclude those outside of continental US
 
+airQ_c_plot1 <-c_prep2%>%
+  mutate(PM= cut(PM2.5.Weighted.Mean.24.hr, breaks=quantile(PM2.5.Weighted.Mean.24.hr, p=seq(0,1,length.out = 6), na.rm=T), include.lowest=T ))%>%
+  ggplot()+geom_sf(aes(fill=PM,color=NA))+
+  scale_color_brewer("Blues")+
+  scale_fill_brewer(palette = "Blues", na.value="grey50")+
+  geom_sf(data=sts, color="black")+
+  ggtitle("24 hour average PM 2.5 Levels by County", subtitle = "US EPA, 2015")
+
+airQ_c_plot2 <-c_prep2%>%
+  mutate(Ozone= cut(Ozone.2nd.Max.1.hr, breaks=quantile(Ozone.2nd.Max.1.hr, p=seq(0,1,length.out = 4), na.rm=T), include.lowest=T ))%>%
+  ggplot()+geom_sf(aes(fill=Ozone,color=NA))+
+  scale_color_brewer("Blues")+
+  scale_fill_brewer(palette = "Blues", na.value="grey50")+
+  geom_sf(data=sts, color="black")+
+  ggtitle("1-hour second max Ozone Levels by County", subtitle = "US EPA, 2015")
+
+#map all 2015 Air Quality data
+cowplot::plot_grid(airQ_c_plot1, airQ_c_plot2)
+```
+
+The Environmental Protection Agency (EPA) publishes extensive amounts of air quality data through their Air Data site. This research focuses on PM 2.5 and Ozone data. PM 2.5 is a measure of the ambient air pollution... EXPLAIN MORE. EPA's annual summaries of air quality metrics by monitoring site for the years 2014 through 2016 are used in this model. Location data on monitoring sites are included in the data set. Spatial interpolation techniques are used to infer air pollution estimates for unobserved locations (see: [Introduction to spatial data analysis \| Data Science (stanford.edu)](https://datascience.stanford.edu/news/introduction-spatial-data-analysis)). MORE ABOUT THIS AND WRAP.
+
+Respiratory health is measured by age-adjusted mortality rates by county, accessed through the Center for Disease Control and Prevention's (CDC) WONDER database. The first data set extracted is all-age, all-cause age-adjusted mortality rate by county for the three-year period from 2014 through 2016. Data were further filtered based on primary reported cause of death based on the ICD-10 code range J00-J99, which encompasses respiratory diseases (NOTATE data integrity as a limitation later). Finally, a third data set limited the respiratory disease age-adjusted mortality rates to the 65 and over population.
+
+```{r}
+#plot mortality data
 
 #plot data 2
 prep1%>%
-  mutate(AAMR= cut(is.na_replace_mean1, breaks=quantile(is.na_replace_mean1, p=seq(0,1,length.out = 6), na.rm=T ), include.lowest=T ))%>%
+  mutate(AAMR= cut(AAMR_all_aa , breaks=quantile(AAMR_all_aa, p=seq(0,1,length.out = 6), na.rm=T ), include.lowest=T ))%>%
   ggplot()+geom_sf(aes(fill=AAMR,color=NA))+
-  scale_color_brewer("Blues")+
-  scale_fill_brewer(palette = "Blues", na.value="grey50")+
+  scale_color_brewer("Purples")+
+  scale_fill_brewer(palette = "Purples", na.value="grey50")+
   geom_sf(data=sts, color="black")+
   ggtitle("Age-Adjusted Mortality Rate", subtitle = "CDC, 2014 - 2016")
 
 #plot data 3
 prep1%>%
-  mutate(AAMR_ICDI= cut(is.na_replace_mean2, breaks=quantile(is.na_replace_mean2, p=seq(0,1,length.out = 5), na.rm=T ), include.lowest=T ))%>%
+  mutate(AAMR_ICDI= cut(AAMR_ICDI_aa, breaks=quantile(AAMR_ICDI_aa, p=seq(0,1,length.out = 5), na.rm=T ), include.lowest=T ))%>%
   ggplot()+geom_sf(aes(fill=AAMR_ICDI,color=NA))+
   scale_color_brewer("Reds")+
   scale_fill_brewer(palette = "Reds", na.value="grey50")+
   geom_sf(data=sts, color="black")+
   ggtitle("Age-Adjusted Mortality Rates - ICD J00 to J99", subtitle = "CDC, 2014 - 2016")
 
-#plot data 4
-prep1%>%
-  mutate(AAMR_ICDI_65= cut(is.na_replace_mean3, breaks=quantile(is.na_replace_mean3, p=seq(0,1,length.out = 5), na.rm=T ), include.lowest=T ))%>%
-  ggplot()+geom_sf(aes(fill=AAMR_ICDI_65,color=NA))+
-  scale_color_brewer("Purples")+
-  scale_fill_brewer(palette = "Purples", na.value="grey50")+
-  geom_sf(data=sts, color="black")+
-  ggtitle("Age-Adjusted Mortality Rates 65+: ICD J00 to J99", subtitle = "CDC, 2014 - 2016")
-
+# 2/11/23 not using for now... a good chunk is marked as unreliable
+# #plot data 4
+# prep1%>%
+#   mutate(AAMR_ICDI_65= cut(AAMR_ICDI_65, breaks=quantile(AAMR_ICDI_65, p=seq(0,1,length.out = 5), na.rm=T ), include.lowest=T ))%>%
+#   ggplot()+geom_sf(aes(fill=AAMR_ICDI_65,color=NA))+
+#   scale_color_brewer("Purples")+
+#   scale_fill_brewer(palette = "Purples", na.value="grey50")+
+#   geom_sf(data=sts, color="black")+
+#   ggtitle("Age-Adjusted Mortality Rates 65+: ICD J00 to J99", subtitle = "CDC, 2014 - 2016")
 ```
 
 ALSO WHERE CAN I GET TOBACCO USE DATA?
@@ -453,51 +515,177 @@ Land cover data used in this model are from the National Land Cover Database (NL
 NEED TO SUMMARIZE BELOW... less explanatory?
 
 ```{r}
-#load in map and locality data
-library(FedData)
-NLCD_W <-get_nlcd(
-  template = sts_W,
-  label = "West",
-  year = 2016,
-  dataset = c("landcover"),
-  landmass = "L48",
-  extraction.dir = paste0(tempdir(), "/FedData/"),
-  raster.options = c("COMPRESS=DEFLATE", "ZLEVEL=9"),
-  force.redo = FALSE
-  )
+#load NLCD download
+NLCD<-raster('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/nlcd_2019_land_cover_l48_20210604.img')
+NLCD_15<- read.csv('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/US_county_2015_nlcd_2011_v1.csv', header = TRUE, sep = ",", fill=TRUE)
 
-#load the NLCD legend from FedData package
+#add leading zeroes
+NLCD_vec_c <- NLCD_15%>% pull(cofips)
+co_vec_NLCD <-sprintf("%05d",as.numeric(NLCD_vec_c))
+
+NLCD_prep1 <-cbind(co_vec_NLCD,NLCD_15)
+NLCD_prep2 <-NLCD_prep1[,-c(2,3,4,5)]
+
+#remove all but the proportion columns - need to fix rename
+NLCD_prep3 <-NLCD_prep2[,-c(2:19)]%>%
+  rename(cofips=co_vec_NLCD)
+
+#merge to our running file
+c_prep3<-left_join(c_prep2, NLCD_prep3, by = "cofips")
+c_prep3<-left_join(c_prep3,regions, by= "STATEFP")
+
+#filter on target regions only
+c_prep4<-c_prep3%>%
+  filter(reg_names%in%c("W","SE","OV","NW"))
+
+# load the NLCD legend from FedData package
 legend<-pal_nlcd()
+variable<-paste("PROP",legend$ID,sep="")
+legend_box<-cbind(legend,variable)
 
-#view coordinate reference system
-#NLCD@crs
+#reshape for box plots
+W_box1<-subset(c_prep4,select=c(1:2,32:48))%>%
+  filter(reg_names%in%c("W"))
 
-# plot the raster
-raster::plot(NLCD_W,
-     main="U.S. NLCD Land Cover: West, 2016") # add title with main
+#careful of reshape2 warning
+W_box2<-reshape2::melt(W_box1,id.vars=c('cofips','NAME','reg_names'),measure.vars=c('PROP11','PROP12','PROP21','PROP22','PROP23','PROP24','PROP31','PROP41','PROP42','PROP43','PROP52','PROP71','PROP81','PROP82','PROP90','PROP95'))
 
-#histogram
-W_hist<-hist(NLCD_W,
-     breaks=6,
-     main="Histogram Digital Surface Model\n NEON Harvard Forest Field Site",
-     col="wheat3",  # changes bin color
-     xlab= "Elevation (m)")  # label the x-axis
+#final touches
+W_box3<-left_join(W_box2,legend_box,by="variable")
 
-# #load in map and locality data
-# NLCD_NW <-get_nlcd(
-#   template = sts_NW,
-#   label = "Northwest",
+############REPEAT FOR SECOND REGION################
+#reshape for box plots
+SE_box1<-subset(c_prep4,select=c(1:2,32:48))%>%
+  filter(reg_names%in%c("SE"))
+
+#careful of reshape2 warning
+SE_box2<-reshape2::melt(SE_box1,id.vars=c('cofips','NAME','reg_names'),measure.vars=c('PROP11','PROP12','PROP21','PROP22','PROP23','PROP24','PROP31','PROP41','PROP42','PROP43','PROP52','PROP71','PROP81','PROP82','PROP90','PROP95'))
+
+#final touches
+SE_box3<-left_join(SE_box2,legend_box,by="variable")
+
+############REPEAT FOR THIRD REGION################
+#reshape for box plots
+OV_box1<-subset(c_prep4,select=c(1:2,32:48))%>%
+  filter(reg_names%in%c("OV"))
+
+#careful of reshape2 warning
+OV_box2<-reshape2::melt(OV_box1,id.vars=c('cofips','NAME','reg_names'),measure.vars=c('PROP11','PROP12','PROP21','PROP22','PROP23','PROP24','PROP31','PROP41','PROP42','PROP43','PROP52','PROP71','PROP81','PROP82','PROP90','PROP95'))
+
+#final touches
+OV_box3<-left_join(OV_box2,legend_box,by="variable")
+
+############REPEAT FOR FOURTH REGION################
+#reshape for box plots
+NW_box1<-subset(c_prep4,select=c(1:2,32:48))%>%
+  filter(reg_names%in%c("NW"))
+
+#careful of reshape2 warning
+NW_box2<-reshape2::melt(NW_box1,id.vars=c('cofips','NAME','reg_names'),measure.vars=c('PROP11','PROP12','PROP21','PROP22','PROP23','PROP24','PROP31','PROP41','PROP42','PROP43','PROP52','PROP71','PROP81','PROP82','PROP90','PROP95'))
+
+#final touches
+NW_box3<-left_join(NW_box2,legend_box,by="variable")
+
+###########PLOT ALL BOXES###############
+#plot West Box Plot
+ggplot(W_box3, aes(x = variable, y = value, fill = Class)) +    # Create boxplot chart in ggplot2
+  geom_boxplot() +
+  labs(x="",y="Percent of County Total") +
+  guides(x="none") +
+  ggtitle("Land Cover Histogram: Counties in NOAA West Region", subtitle = "NLCD 2019")
+
+#plot Southeast Box Plot
+ggplot(SE_box3, aes(x = variable, y = value, fill = Class)) +    # Create boxplot chart in ggplot2
+  geom_boxplot() +
+  labs(x="",y="Percent of County Total") +
+  guides(x="none") +
+  ggtitle("Land Cover Histogram: Counties in NOAA Southeast Region", subtitle = "NLCD 2019")
+
+#plot Ohio Valley Box Plot
+ggplot(OV_box3, aes(x = variable, y = value, fill = Class)) +    # Create boxplot chart in ggplot2
+  geom_boxplot() +
+  labs(x="",y="Percent of County Total") +
+  guides(x="none") +
+  ggtitle("Land Cover Histogram: Counties in NOAA Ohio Valley Region", subtitle = "NLCD 2019")
+
+#plot Northwest Box Plot
+ggplot(NW_box3, aes(x = variable, y = value, fill = Class)) +    # Create boxplot chart in ggplot2
+  geom_boxplot() +
+  labs(x="",y="Percent of County Total") +
+  guides(x="none") +
+  ggtitle("Land Cover Histogram: Counties in NOAA Northwest Region", subtitle = "NLCD 2019")
+
+#box plot target variable 1
+ggplot(c_prep4, aes(x = reg_names, y = PROP21, fill = reg_names)) +    # Create boxplot chart in ggplot2
+  geom_boxplot()+
+  labs(x="",y="Percent of County Total") +
+  ggtitle("Land Cover Histogram: Developed, Open Space", subtitle = "NLCD 2019")
+
+#box plot target variable 2
+ggplot(c_prep4, aes(x = reg_names, y = PROP22, fill = reg_names)) +    # Create boxplot chart in ggplot2
+  geom_boxplot()+
+  labs(x="",y="Percent of County Total") +
+  ggtitle("Land Cover Histogram: Developed, Low Intensity", subtitle = "NLCD 2019")
+
+#box plot target variable 3
+ggplot(c_prep4, aes(x = reg_names, y = PROP23, fill = reg_names)) +    # Create boxplot chart in ggplot2
+  geom_boxplot()+
+  labs(x="",y="Percent of County Total") +
+  ggtitle("Land Cover Histogram: Developed, Medium Intensity", subtitle = "NLCD 2019")
+
+#box plot target variable 4
+ggplot(c_prep4, aes(x = reg_names, y = PROP24, fill = reg_names)) +    # Create boxplot chart in ggplot2
+  geom_boxplot()+
+  labs(x="",y="Percent of County Total") +
+  ggtitle("Land Cover Histogram: Developed, High Intensity", subtitle = "NLCD 2019")
+  
+# sts_proj <- projectRaster(sts,crs=crs(NLCD))
+# 
+# e_sts_W <- as(extent(sts_W),'SpatialPolygons')
+# crs(e_sts_W) <- crs(NLCD)
+#NLCD_w <- crop(NLCD,e_sts_W, mask = T)
+#
+#resample(NLCD,sts_W)
+# 
+# myKey <- list(rectangles=list(col = legend$Color),
+#              text=list(lab=legend$Class),
+#              space='left',
+#              columns=1,
+#              size=2,
+#              cex=.6)
+# 
+# 
+# # load in map and locality data
+# library(FedData)
+# NLCD_W <-get_nlcd(
+#   template = sts_W,
+#   label = "West",
 #   year = 2016,
 #   dataset = c("landcover"),
 #   landmass = "L48",
-#   extraction.dir = paste0(tempdir(), "/FedData/"),
-#   raster.options = c("COMPRESS=DEFLATE", "ZLEVEL=9"),
-#   force.redo = FALSE
+#   force.redo = TRUE
 #   )
 # 
-# # plot the raster
-# raster::plot(NLCD_NW, 
-#      main="U.S. NLCD Land Cover: Northwest, 2016") # add title with main
+# rasterVis::levelplot(NLCD_W,
+#           col.regions=legend$Color,
+#           par.settings = list(axis.line = list(col = "transparent"), 
+#                strip.background = list(col = 'transparent'), 
+#                strip.border = list(col = 'transparent')), 
+#           scales = list(col = "transparent"),
+#           colorkey=F,
+#           key=myKey)
+# 
+# # #calculate frequency over region... need to do this over counties
+# # f <- freq(NLCD_W)
+# # f <- data.frame(f)
+# # f$area <- round(f$count * 900 / 1e6, 1)
+# # levs <- levels(NLCD_W)[[1]]
+# # f$class <- levs[f$value + 1]
+# # 
+# # f_W<-f%>%
+# #   rename(ID = value)%>%
+# #   left_join(f, legend, by="ID")
+# # # sum(f$area)
 # 
 # #load in map and locality data
 # NLCD_OV <-get_nlcd(
@@ -506,46 +694,95 @@ W_hist<-hist(NLCD_W,
 #   year = 2016,
 #   dataset = c("landcover"),
 #   landmass = "L48",
-#   extraction.dir = paste0(tempdir(), "/FedData/"),
-#   raster.options = c("COMPRESS=DEFLATE", "ZLEVEL=9"),
-#   force.redo = FALSE
+#   force.redo = TRUE
 #   )
 # 
-# # plot the raster
-# raster::plot(NLCD_OV, 
-#      main="U.S. NLCD Land Cover: Ohio Valley Region, 2016") # add title with main
+# rasterVis::levelplot(NLCD_OV,
+#           col.regions=legend$Color,
+#           par.settings = list(axis.line = list(col = "transparent"), 
+#                strip.background = list(col = 'transparent'), 
+#                strip.border = list(col = 'transparent')), 
+#           scales = list(col = "transparent"),
+#           colorkey=F,
+#           key=myKey)
+# 
+# # #load in map and locality data
+# # NLCD_S <-get_nlcd(
+# #   template = sts_S,
+# #   label = "South",
+# #   year = 2016,
+# #   dataset = c("landcover"),
+# #   landmass = "L48",
+# #   force.redo = TRUE
+# #   )
+# # 
+# # rasterVis::levelplot(NLCD_S,
+# #           col.regions=legend$Color,
+# #           par.settings = list(axis.line = list(col = "transparent"), 
+# #                strip.background = list(col = 'transparent'), 
+# #                strip.border = list(col = 'transparent')), 
+# #           scales = list(col = "transparent"),
+# #           colorkey=F,
+# #           key=myKey)
 # 
 # #load in map and locality data
-# NLCD_S <-get_nlcd(
-#   template = sts_S,
-#   label = "South",
+# NLCD_SE <-get_nlcd(
+#   template = sts_SE,
+#   label = "Southeast",
 #   year = 2016,
 #   dataset = c("landcover"),
 #   landmass = "L48",
-#   extraction.dir = paste0(tempdir(), "/FedData/"),
-#   raster.options = c("COMPRESS=DEFLATE", "ZLEVEL=9"),
-#   force.redo = FALSE
+#   force.redo = TRUE
 #   )
 # 
-# # plot the raster
-# raster::plot(NLCD_S, 
-#      main="U.S. NLCD Land Cover: South, 2016") # add title with main
+# rasterVis::levelplot(NLCD_SE,
+#           col.regions=legend$Color,
+#           par.settings = list(axis.line = list(col = "transparent"), 
+#                strip.background = list(col = 'transparent'), 
+#                strip.border = list(col = 'transparent')), 
+#           scales = list(col = "transparent"),
+#           colorkey=F,
+#           key=myKey)
 # 
-# #load in map and locality data
-# #NLCD_SE <-get_nlcd(
-# #  template = sts_SE,
-# #  label = "Southeast",
-# #  year = 2016,
-# #  dataset = c("landcover"),
-# #  landmass = "L48",
-# #  extraction.dir = paste0(tempdir(), "/FedData/"),
-# #  raster.options = c("COMPRESS=DEFLATE", "ZLEVEL=9"),
-# #  force.redo = FALSE
-# #  )
+# # #load in map and locality data
+# # NLCD_NW <-get_nlcd(
+# #   template = sts_NW,
+# #   label = "Northwest",
+# #   year = 2016,
+# #   dataset = c("landcover"),
+# #   landmass = "L48",
+# #   force.redo = TRUE
+# #   )
+# # 
+# # rasterVis::levelplot(NLCD_NW,
+# #           col.regions=legend$Color,
+# #           par.settings = list(axis.line = list(col = "transparent"), 
+# #                strip.background = list(col = 'transparent'), 
+# #                strip.border = list(col = 'transparent')), 
+# #           scales = list(col = "transparent"),
+# #           colorkey=F,
+# #           key=myKey)
 # 
-# # plot the raster
-# #raster::plot(NLCD_SE, 
-# #     main="U.S. NLCD Land Cover: Southeast, 2016") # add title with main
+# #trying to estimate raster values by county
+# #find data source for map by county
+# county_W <-counties(state = W, cb = TRUE, resolution = "500k", year = 2016,keep_zipped_shapefile=TRUE)
+# 
+#filter on NOAA region - West... did not work due to size
+#
+# (class.counts <- lapply(e_W, table))
+# (class.prop <- lapply(e_W, FUN = function(x) {prop.table(table(x))}))
+
+# Table of areas in km^2 -not working. delete?
+# NLCD_OV_tbl <-
+#   NLCD_OV %>%
+#   values() %>%
+#   tibble::tibble(landcover = .) %>%
+#   na.omit() %>%
+#   dplyr::group_by(landcover) %>%
+#   count(name = "freq") %>%
+#   dplyr::mutate(area = (freq * 900) %>%
+#                   units::set_units("m^2") %>%
+#                   units::set_units("km^2"))
 
 ```
 
@@ -554,5 +791,13 @@ The dependent variable that is being used as a proxy for health is age-adjusted 
 Different combinations of variables are tested to evaluate what creates the best model, and results are evaluated for statistical significance. The first model evaluated includes the percent of urban households within a county to distinguish differences in county makeup.
 
 A linear regression model is then evaluated for spatial autocorrelation. The regression model depends on independence and heteroskedasticity of residuals. If spatial autocorrelation is present, then both rules are broken. Spatial autocorrelation is tested using the Global Moran's I test, followed by mapping the Local Moran's I. Spatial clustering is revealed by the Local Indicator of Spatial Association (LISA) map. The Lagrange Multiplier test is consulted to determine if spatial error or spatial lag is driving spatial autocorrelation in the model. Based on the Lagrange Multiplier results, the spatial lag model is used to try to produce a better model. GWR model?
+```{r}
+#prep data
+smokers_c <- read_excel('C:/Users/tamas/OneDrive/Documents/APDEM 808/data files/2016 smoking-v3.xlsx')
+
+c_prep3<-left_join(c_prep2,smokers_c, by="cofips")
+c_prep3<-subset(c_prep3,select=-c(32,33))
+                
+```
 
 ------------------------------------------------------------------------
