@@ -1,8 +1,10 @@
-# Data Summary {.unnumbered}
+# Index {.unnumbered}
 
-This section is to satisfy L04 Assignment: Summary of Data Use
+UPDATE 2/27: THIS SECTION IS NOT UP TO DATE. DO NOT READ.
 
 ![](data%20summary.png)
+
+UPDATE 2/27: THIS SECTION IS NOT UP TO DATE. DO NOT READ.
 
 Data fall into four major categories: health, demographic, air pollution, and land use. However, since this is a spatial analysis, the common thread in all data sources is the spatial linkage. Spatial evaluation of air pollution's impact on health is considered on a regional level. Following the approach that Simon and colleagues take to evaluate ozone trends in the U.S., this analysis also uses NOAA climate regions in the analysis of air pollution [-@simon2015]. Evaluation of data on a regional scale lowers the model's sensitivity to factors such as wind, climate, and pollutants' chemical reactions with other molecules in the air that can cause the concentration of air pollution to change [@simon2015, pp 186, pp. 188]. To this end, five regions were selected for this research, which represent different climate areas and a wide variety of land cover types.
 
