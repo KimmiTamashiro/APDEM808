@@ -449,7 +449,10 @@ x_num_mean3 <- as.numeric(mean(is.na_replace_mean3, na.rm = TRUE))        # Calc
 is.na_replace_mean3[is.na(is.na_replace_mean3)] <- x_num_mean3
 
 #merge with data table
-prep1 <- cbind(merge3,is.na_replace_mean1, is.na_replace_mean2, is.na_replace_mean3)
+prep1 <- cbind(merge3,is.na_replace_mean1, is.na_replace_mean2, is.na_replace_mean3)%>%
+  rename(AAMR_all_aa_use = is.na_replace_mean1,
+         AAMR_all_ICDI_use = is.na_replace_mean2,
+         AAMR_all_ICDI65_use = is.na_replace_mean3)
 
 #prep county airQ data; add leading zeroes to state and county
 airQ_vec_c <- airQ_county_m%>% pull(cofips)
@@ -1131,7 +1134,103 @@ prep1%>%
   geom_sf(data=sts, color="black")+
   ggtitle("Age-Adjusted Mortality Rates 65+: Cardiovascular & Respiratory Diseases", subtitle = "Rates per 100,000; CDC, 2014 - 2016")
 ```
+```{r}
+#| fig-width: 12
+#| fig-height: 8
+#| fig-cap: Figure 4; UPDATE CAPTION
+plot_cor_cdd_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "CDD", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Cooling Degree Days",
+          xlab = "", ylab = "")
 
+plot_cor_hdd_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "HDD", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Heating Degree Days",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Precipitation",
+          xlab = "", ylab = "")
+
+plot_cor_tavg_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "TAVG", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Annual Temperature",
+          xlab = "", ylab = "")
+
+plot_cor_tmax_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "TMAX", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Maximum Temp",
+          xlab = "", ylab = "")
+
+plot_cor_tmin_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "TMIN", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Minumum Temp",
+          xlab = "", ylab = "")
+
+#plot
+grid.arrange(plot_cor_tavg_mor, plot_cor_tmin_mor, plot_cor_tmax_mor, plot_cor_cdd_mor, plot_cor_hdd_mor, plot_cor_pcp_mor, 
+             ncol = 3, nrow=2,
+             top = textGrob("Correlation: Age-Adjusted Mortality Rates and Climate Variables by County",gp=gpar(fontsize=18,font=3)),
+             left = textGrob("Climate Variable", rot = 90,gp=gpar(fontsize=15,font=3)),
+             bottom = textGrob("Age Adjusted Mortality Rate",gp=gpar(fontsize=15,font=3))
+             )
+```
+
+```{r}
+#| fig-width: 12
+#| fig-height: 8
+#| fig-cap: Figure 4; UPDATE CAPTION
+plot_cor_cdd_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "CDD", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Cooling Degree Days",
+          xlab = "", ylab = "")
+
+plot_cor_hdd_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "HDD", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Heating Degree Days",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Precipitation",
+          xlab = "", ylab = "")
+
+plot_cor_tavg_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "TAVG", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Annual Temperature",
+          xlab = "", ylab = "")
+
+plot_cor_tmax_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "TMAX", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Maximum Temp",
+          xlab = "", ylab = "")
+
+plot_cor_tmin_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "TMIN", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Minumum Temp",
+          xlab = "", ylab = "")
+
+#plot
+grid.arrange(plot_cor_tavg_mor65, plot_cor_tmin_mor65, plot_cor_tmax_mor65, plot_cor_cdd_mor65, plot_cor_hdd_mor65, plot_cor_pcp_mor65, 
+             ncol = 3, nrow=2,
+             top = textGrob("Correlation: Age-Adjusted Mortality Rates and Climate Variables by County",gp=gpar(fontsize=18,font=3)),
+             left = textGrob("Climate Variable", rot = 90,gp=gpar(fontsize=15,font=3)),
+             bottom = textGrob("Age Adjusted Mortality Rate, 65 and over",gp=gpar(fontsize=15,font=3))
+             )
+```
 To further characterize county populations, demographic and behavioral data are consulted. 2015 data on age-adjusted adult smoking rates by county are extracted from the University of Wisconsin Public Health Institute's County Health Rankings. This data are consulted to normalize out any distortions caused by smoking habits by county. However, prevalence rates do not capture the severity of tobacco use by individual. Severity of smoking habits are not considered in this model. County Health Rankings' source for its smoking data is the CDC's Behavioral Risk Factor Surveillance System (BRFSS) [@adultsm]. County Health Rankings data aggregates other useful variables that are used in their model. Adult obesity rates by county, sourced from BRFSS data, are also used. One limitation to the BRFSS is that data is collected from surveys, then extrapolated to characterize county-level summaries. The conduction of surveys and extrapolation process leave room for error so is noted for transparency. Another data point extracted from County Health Rankings is the percent of the population that is uninsured (Source: U.S. Census Bureau's Small Area Health Insurance Estimates (SAHIE)) [@2022mea]. SAHIE's percent uninsured estimates the percent of the population that is 65 and under who do not have health insurance [@uninsure]. According to the U.S. Census Bureau, "SAHIE uses statistical models that combine survey data from the American Community Survey (ACS) with administrate records data and Census 2010 data," [@bureau]. The benefit of SAHIE's modeling approach is that it attempts to control for estimates for small areas where data is more sparse [@bureau]. As with any modeled data, a notable risk is the reliance on the robustness of the U.S. Census Bureau's model, though the Census Bureau does provide margins of error for their model results. Other demographic data are obtained from the U.S. Census Bureau's American Community Survey (ACS) 5-year estimates. 2016 data for following variables are used in this model: Percent poverty, percent Black, percent Hispanic, urbanization, and education statistics. ACS data are obtained through the Census API, accessed through R Studio.
 
 Land cover data used in this model are originally sourced from the National Land Cover Database's (NLCD). The International Public Use Microdata Series (IPUMS) released county-level summaries of NLCD land cover data, which are displayed in the ensuing plots. Per IPUMS' annotations on methodology, NLCD data were layered with census geographic polygons to calculate the area covered by each land class [@environm]. Land cover classifications are determined by NLCD using a modified Anderson Land Cover Classification System [@national]. A description of NLCD's land cover classifications are denoted in the data table below. Data used in this model reflect 2011 land cover data summarized by county geographic boundaries in the U.S. Census Bureau's 2015 data set.
@@ -1372,14 +1471,11 @@ grid.arrange(plot_ridge_NW, plot_ridge_W, plot_ridge_NR, plot_ridge_SW, plot_rid
 
 This research uses regression modeling on three NOAA climate regions to test if creating models for each region produces significant results. The region-based modeling using NOAA's climatically consistent region definitions draws from research on by Simon and colleagues. Simon and colleagues justify their use of NOAA climate regions by acknowledging that ozone patterns are partially determined by temperature and precipitation [-@simon2015, pp. 188]. Additionally, they note that climate regions generally group areas with similar emissions types and similar trends in temporal variation due to daylight and season [@simon2015, pp. 188]. By modeling for each region, I attempt to normalize out some of the variation due to climate, seasonality, and emissions type which should remove some noise from the models.
 
-Calculating the entropy index: Let $$p_j$$ be the percentage each of land use type j in the county, and let n be the number of land use types j.
+Calculating the entropy index: Let Pj be the percentage each of land use type j in the county, and let n be the number of land use types j.
 
 $$ 
 Entropy = 
-
 -[\sum_{j=1}^n p_j \ln p_j]/ln(n)
-
-
 $$
 
 
@@ -1399,7 +1495,7 @@ c_prep6%>%
   mutate(entropy= cut(entropy, breaks=quantile(entropy, p=seq(0,1,length.out = 6), na.rm=T ), include.lowest=T ))%>%
   ggplot()+geom_sf(aes(fill=entropy,color=NA))+
   scale_colour_viridis_d()+
-  scale_fill_viridis_d(option = "cividis",direction = -1, na.value="grey50")+
+  scale_fill_viridis_d(option = "cividis",direction = -1, na.value="grey15")+
   scale_y_continuous(label=scales::comma)+
   geom_sf(data=sts, color="black")+
   ggtitle("Land Use Entropy Index by County", subtitle = "NLCD 2011")
@@ -1417,7 +1513,193 @@ A linear regression model is then evaluated for spatial autocorrelation. The reg
 health_c <- read_excel('data files/2016 county health v3.xlsx') 
 c_prep7<-left_join(c_prep6,health_c, by="cofips") 
 c_prep7<-subset(c_prep7,select=-c(74:75)) 
-#START TO MAP VARIABLES IN LISA #
+
+#drop unnecessary variables
+c_df <- subset(c_prep7, select = -c(13:18,25:27,29:31,33:35,37:39,41:43,45:47,49:50,55:64))
+
+#calculate percentages: demographic variables
+c_df1 <- c_df%>%
+  mutate(pct_white = c_df$estimate_tot_wht / c_df$estimate_tot_pop)%>%
+  mutate(pct_black = c_df$estimate_tot_blk / c_df$estimate_tot_pop)%>%
+  mutate(pct_hispanic = c_df$estimate_tot_his / c_df$estimate_tot_pop)%>%
+  mutate(pct_lessHS = c_df$estimate_tot_LessthanHS / c_df$estimate_tot_pop)%>%
+  mutate(pct_HS = c_df$estimate_tot_HS / c_df$estimate_tot_pop)%>%
+  mutate(pct_college = c_df$estimate_tot_somecollege / c_df$estimate_tot_pop)%>%
+  mutate(pct_bach = c_df$estimate_tot_bach / c_df$estimate_tot_pop)%>%
+  mutate(pct_pov = c_df$estimate_tot_pov / c_df$estimate_tot_pop)%>%
+  rename(pct_smokers = '% Smokers')%>%
+  rename(pct_obese = '% Obese')%>%
+  rename(pct_uninsured = '% Uninsured')%>%
+  rename(pct_rural = '% Rural')
+  
+c_df1 <- subset(c_df1,select=-c(4:11))
+
+
+# prep data for OLS model
+#removed rural... too many NAs... is there another source?
+#removing items not needed in model A & filter complete cases
+c_df2_a <-subset(c_df1,select=-c(2:5,7,9:10,13:28,33,37:39))%>%
+    filter(complete.cases(AAMR_all_ICDI_use,pct_white,pct_black,pct_hispanic,pct_bach,pct_pov,PM2.5,pct_smokers,pct_obese,pct_uninsured,entropy,HDD,PCP))
+
+ #removing items not needed in model B & filter complete cases                              
+c_df2_b <-subset(c_df1,select=-c(2:6,9:10,13:28,33,37:39))%>%
+    filter(complete.cases(AAMR_all_ICDI65_use,pct_white,pct_black,pct_hispanic,pct_bach,pct_pov,PM2.5,pct_smokers,pct_obese,pct_uninsured,entropy,HDD,PCP))
+
+#remove geometry
+c_df3_a <- c_df2_a%>%
+  st_set_geometry(NULL)
+
+c_df3_b <- c_df2_b%>%
+  st_set_geometry(NULL)
+
+#remove the county fips prior to scaling
+c_df4_a <-subset(c_df3_a,select=-c(1))
+c_df4_b <-subset(c_df3_b,select=-c(1))
+
+#scale the dataframes 
+c_df5_a <-scale(c_df4_a)
+c_df5_b <-scale(c_df4_b)
+
+#bind back to county data
+c_df6_a <-as.data.frame(cbind(c_df3_a$cofips,c_df5_a))
+c_df6_b <-as.data.frame(cbind(c_df3_b$cofips,c_df5_b))
+
+#ensure numeric
+c_df6_a[]<-lapply(c_df6_a,as.numeric)
+c_df6_b[]<-lapply(c_df6_b,as.numeric)
+
+#OLS model A
+fit_c_df_a<- lm(AAMR_all_ICDI_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy + HDD + PCP, data = c_df6_a)
+
+# #OLS model B
+fit_c_df_b<- lm(AAMR_all_ICDI65_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy + HDD + PCP, data = c_df6_b)
+
+summary(fit_c_df_a)
+summary(fit_c_df_b)
+
+# #transform to spatial polygon
+df_1_as<-as_Spatial(c_df2_a)
+df_1_bs<-as_Spatial(c_df2_b)
+
+#WEIGHTS MATRICES A
+# Create the K=4 spatial weights matrix
+coords_a4 <- coordinates(df_1_as)
+col.knn_a4 <- knearneigh(coords_a4, k = 4, longlat = T)
+df_1a_wt4 <- nb2listw(knn2nb(col.knn_a4), style = "W")
+
+# Create the K=6 spatial weights matrix
+coords_a6 <- coordinates(df_1_as)
+col.knn_a6 <- knearneigh(coords_a6, k = 6, longlat = T)
+df_1a_wt6 <- nb2listw(knn2nb(col.knn_a6), style = "W")
+
+# Create the K=10 spatial weights matrix
+coords_a10 <- coordinates(df_1_as)
+col.knn_a10 <- knearneigh(coords_a10, k = 10, longlat = T)
+df_1a_wt10 <- nb2listw(knn2nb(col.knn_a10), style = "W")
+
+lm.morantest(fit_c_df_a, listw = df_1a_wt4)
+lm.morantest(fit_c_df_a, listw = df_1a_wt6)
+lm.morantest(fit_c_df_a, listw = df_1a_wt10)
+
+#WEIGHTS MATRICES B
+# Create the K=4 spatial weights matrix
+coords_b4 <- coordinates(df_1_bs)
+col.knn_b4 <- knearneigh(coords_b4, k = 4, longlat = T)
+df_1b_wt4 <- nb2listw(knn2nb(col.knn_b4), style = "W")
+
+# Create the K=6 spatial weights matrix
+coords_b6 <- coordinates(df_1_bs)
+col.knn_b6 <- knearneigh(coords_b6, k = 6, longlat = T)
+df_1b_wt6 <- nb2listw(knn2nb(col.knn_b6), style = "W")
+
+# Create the K=10 spatial weights matrix
+coords_b10 <- coordinates(df_1_bs)
+col.knn_b10 <- knearneigh(coords_b10, k = 10, longlat = T)
+df_1b_wt10 <- nb2listw(knn2nb(col.knn_b10), style = "W")
+
+lm.morantest(fit_c_df_b, listw = df_1b_wt4)
+lm.morantest(fit_c_df_b, listw = df_1b_wt6)
+lm.morantest(fit_c_df_b, listw = df_1b_wt10)
+
+#Mapping Model Residuals - Model A
+c_df2_a$rstudent <- rstudent(fit_c_df_a)
+
+c_df2_a%>%
+  ggplot(aes(fill = rstudent)) + 
+  geom_sf() +
+  ggtitle(label = "Distribution of Model Residuals", subtitle = "US Counties") + 
+  theme(legend.position = "bottom") + 
+  scale_fill_viridis_c(, direction = -1) + theme(legend.key.width = unit(0.5,"in"))
+
+# Plot the Moran Statistic for the Residuals!
+# df_2_wtr <- nb2listw(df_2.nbr, style = "W")
+
+#Local Moran Cluster Map -- model residuals
+locali_r <- localmoran(c_df2_a$rstudent, listw = df_1a_wt6, alternative = "two.sided" )
+c_df2_a$locali_r <- locali_r[,1]
+c_df2_a$localp_r <- locali_r[,5]
+
+c_df2_a$sinc_r <- scale(c_df2_a$rstudent)
+c_df2_a$lag_inc_r <- lag.listw(var=c_df2_a$sinc_r, x = df_1a_wt6)
+c_df2_a$quad_sig_r <- NA
+c_df2_a$quad_sig_r[(c_df2_a$sinc_r >= 0 & c_df2_a$lag_inc_r >= 0) & (c_df2_a$localp_r <= 0.05)] <- 1
+c_df2_a$quad_sig_r[(c_df2_a$sinc_r <= 0 & c_df2_a$lag_inc_r <= 0) & (c_df2_a$localp_r <= 0.05)] <- 2
+c_df2_a$quad_sig_r[(c_df2_a$sinc_r >= 0 & c_df2_a$lag_inc_r <= 0) & (c_df2_a$localp_r <= 0.05)] <- 3
+c_df2_a$quad_sig_r[(c_df2_a$sinc_r >= 0 & c_df2_a$lag_inc_r <= 0) & (c_df2_a$localp_r <= 0.05)] <- 4
+c_df2_a$quad_sig_r[(c_df2_a$sinc_r <= 0 & c_df2_a$lag_inc_r >= 0) & (c_df2_a$localp_r <= 0.05)] <- 5  
+
+#assign breaks for the thematic map classes
+
+breaks <- seq(1, 5, 1)
+np_r <- findInterval(c_df2_a$quad_sig_r, breaks)
+
+# Assign colors
+
+labels <- c("High-High", "Low-Low", "High-Low", "Low-High", "Not Clustered")
+colors <- c("red", "blue", "lightpink", "skyblue2", "white")
+
+plot(c_df2_a['rstudent'], col = colors[np_r], main="Moran LISA Cluster Map - Model Residuals (KNN = 6)")
+legend("topright", legend = labels, fill = colors, bty = "n")
+
+#Mapping Model Residuals - Model B
+c_df2_b$rstudent <- rstudent(fit_c_df_b)
+
+c_df2_b%>%
+  ggplot(aes(fill = rstudent)) + 
+  geom_sf() +
+  ggtitle(label = "Distribution of Model Residuals", subtitle = "US Counties") + 
+  theme(legend.position = "bottom") + 
+  scale_fill_viridis_c(, direction = -1) + theme(legend.key.width = unit(0.5,"in"))
+
+# Plot the Moran Statistic for the Residuals!
+# df_2_wtr <- nb2listw(df_2.nbr, style = "W")
+
+#Local Moran Cluster Map -- model residuals
+locali_r <- localmoran(c_df2_b$rstudent, listw = df_1b_wt6, alternative = "two.sided" )
+c_df2_b$locali_r <- locali_r[,1]
+c_df2_b$localp_r <- locali_r[,5]
+
+c_df2_b$sinc_r <- scale(c_df2_b$rstudent)
+c_df2_b$lag_inc_r <- lag.listw(var=c_df2_b$sinc_r, x = df_1b_wt6)
+c_df2_b$quad_sig_r <- NA
+c_df2_b$quad_sig_r[(c_df2_b$sinc_r >= 0 & c_df2_b$lag_inc_r >= 0) & (c_df2_b$localp_r <= 0.05)] <- 1
+c_df2_b$quad_sig_r[(c_df2_b$sinc_r <= 0 & c_df2_b$lag_inc_r <= 0) & (c_df2_b$localp_r <= 0.05)] <- 2
+c_df2_b$quad_sig_r[(c_df2_b$sinc_r >= 0 & c_df2_b$lag_inc_r <= 0) & (c_df2_b$localp_r <= 0.05)] <- 3
+c_df2_b$quad_sig_r[(c_df2_b$sinc_r >= 0 & c_df2_b$lag_inc_r <= 0) & (c_df2_b$localp_r <= 0.05)] <- 4
+c_df2_b$quad_sig_r[(c_df2_b$sinc_r <= 0 & c_df2_b$lag_inc_r >= 0) & (c_df2_b$localp_r <= 0.05)] <- 5  
+
+#assign breaks for the thematic map classes
+
+breaks <- seq(1, 5, 1)
+np_r <- findInterval(c_df2_b$quad_sig_r, breaks)
+
+# Assign colors
+
+labels <- c("High-High", "Low-Low", "High-Low", "Low-High", "Not Clustered")
+colors <- c("red", "blue", "lightpink", "skyblue2", "white")
+
+plot(c_df2_b['rstudent'], col = colors[np_r], main="Moran LISA Cluster Map 65+ - Model Residuals (KNN = 6)")
+legend("topright", legend = labels, fill = colors, bty = "n")
 ```
 
 ------------------------------------------------------------------------

@@ -295,6 +295,26 @@ div.csl-indent {
 <p><img src="intro_files/figure-html/unnamed-chunk-12-3.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="intro_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="1152"></p>
+<p></p><figcaption class="figure-caption">Figure 4; UPDATE CAPTION</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="intro_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="1152"></p>
+<p></p><figcaption class="figure-caption">Figure 4; UPDATE CAPTION</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
 <p>To further characterize county populations, demographic and behavioral data are consulted. 2015 data on age-adjusted adult smoking rates by county are extracted from the University of Wisconsin Public Health Institute’s County Health Rankings. This data are consulted to normalize out any distortions caused by smoking habits by county. However, prevalence rates do not capture the severity of tobacco use by individual. Severity of smoking habits are not considered in this model. County Health Rankings’ source for its smoking data is the CDC’s Behavioral Risk Factor Surveillance System (BRFSS) <span class="citation" data-cites="adultsm">(<a href="references.html#ref-adultsm" role="doc-biblioref"><span>“Adult Smoking,”</span> n.d.</a>)</span>. County Health Rankings data aggregates other useful variables that are used in their model. Adult obesity rates by county, sourced from BRFSS data, are also used. One limitation to the BRFSS is that data is collected from surveys, then extrapolated to characterize county-level summaries. The conduction of surveys and extrapolation process leave room for error so is noted for transparency. Another data point extracted from County Health Rankings is the percent of the population that is uninsured (Source: U.S. Census Bureau’s Small Area Health Insurance Estimates (SAHIE)) <span class="citation" data-cites="2022mea">(<a href="references.html#ref-2022mea" role="doc-biblioref"><span>“2022 Measures,”</span> n.d.</a>)</span>. SAHIE’s percent uninsured estimates the percent of the population that is 65 and under who do not have health insurance <span class="citation" data-cites="uninsure">(<a href="references.html#ref-uninsure" role="doc-biblioref"><span>“Uninsured,”</span> n.d.</a>)</span>. According to the U.S. Census Bureau, “SAHIE uses statistical models that combine survey data from the American Community Survey (ACS) with administrate records data and Census 2010 data,” <span class="citation" data-cites="bureau">(<a href="references.html#ref-bureau" role="doc-biblioref">Bureau, n.d.</a>)</span>. The benefit of SAHIE’s modeling approach is that it attempts to control for estimates for small areas where data is more sparse <span class="citation" data-cites="bureau">(<a href="references.html#ref-bureau" role="doc-biblioref">Bureau, n.d.</a>)</span>. As with any modeled data, a notable risk is the reliance on the robustness of the U.S. Census Bureau’s model, though the Census Bureau does provide margins of error for their model results. Other demographic data are obtained from the U.S. Census Bureau’s American Community Survey (ACS) 5-year estimates. 2016 data for following variables are used in this model: Percent poverty, percent Black, percent Hispanic, urbanization, and education statistics. ACS data are obtained through the Census API, accessed through R Studio.</p>
 <p>Land cover data used in this model are originally sourced from the National Land Cover Database’s (NLCD). The International Public Use Microdata Series (IPUMS) released county-level summaries of NLCD land cover data, which are displayed in the ensuing plots. Per IPUMS’ annotations on methodology, NLCD data were layered with census geographic polygons to calculate the area covered by each land class <span class="citation" data-cites="environm">(<a href="references.html#ref-environm" role="doc-biblioref"><span>“Environmental Summaries | IPUMS NHGIS,”</span> n.d.</a>)</span>. Land cover classifications are determined by NLCD using a modified Anderson Land Cover Classification System <span class="citation" data-cites="national">(<a href="references.html#ref-national" role="doc-biblioref"><span>“National Land Cover Database Class Legend and Description | Multi-Resolution Land Characteristics (MRLC) Consortium,”</span> n.d.</a>)</span>. A description of NLCD’s land cover classifications are denoted in the data table below. Data used in this model reflect 2011 land cover data summarized by county geographic boundaries in the U.S. Census Bureau’s 2015 data set.</p>
 <div class="quarto-figure quarto-figure-center">
@@ -307,7 +327,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="intro_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="intro_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
 <p></p><figcaption class="figure-caption">Figure 11; UPDATE CAPTION</figcaption><p></p>
 </figure>
 </div>
@@ -317,27 +337,201 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="intro_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="1344"></p>
+<p><img src="intro_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="1344"></p>
 <p></p><figcaption class="figure-caption">Figure 12; UPDATE CAPTION</figcaption><p></p>
 </figure>
 </div>
 </div>
 </div>
 <p>This research uses regression modeling on three NOAA climate regions to test if creating models for each region produces significant results. The region-based modeling using NOAA’s climatically consistent region definitions draws from research on by Simon and colleagues. Simon and colleagues justify their use of NOAA climate regions by acknowledging that ozone patterns are partially determined by temperature and precipitation <span class="citation" data-cites="simon2015">(<a href="references.html#ref-simon2015" role="doc-biblioref">2015, 188</a>)</span>. Additionally, they note that climate regions generally group areas with similar emissions types and similar trends in temporal variation due to daylight and season <span class="citation" data-cites="simon2015">(<a href="references.html#ref-simon2015" role="doc-biblioref">Simon et al. 2015, 188</a>)</span>. By modeling for each region, I attempt to normalize out some of the variation due to climate, seasonality, and emissions type which should remove some noise from the models.</p>
-<p>Calculating the entropy index: Let <span class="math display">\[p_j\]</span> be the percentage each of land use type j in the county, and let n be the number of land use types j.</p>
-<p>$$ Entropy =</p>
-<p>-[_{j=1}^n p_j p_j]/ln(n)</p>
-<p>$$</p>
+<p>Calculating the entropy index: Let Pj be the percentage each of land use type j in the county, and let n be the number of land use types j.</p>
+<p><span class="math display">\[
+Entropy =
+-[\sum_{j=1}^n p_j \ln p_j]/ln(n)
+\]</span></p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="intro_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+<p><img src="intro_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Data are first approximated at a county level. Air quality data is captured by monitors, whose locations are indicated in the EPA’s data files. In order to spread air quality metrics over space, spatial interpolation is used (add specifications). Land cover data is also approximated at the county level by using R to quantify the area of major land cover types that are measured in each county.REMOVE?</p>
 <p>The dependent variable that is being used as a proxy for health is age-adjusted mortality rate for respiratory diseases. After a review of the dependent and independent variables, OLS regression models are consulted. The OLS regression model will estimate the effect of the independent variables on the dependent variable. Different combinations of variables are tested to evaluate what creates the best model, and results are evaluated for statistical significance.</p>
 <p>A linear regression model is then evaluated for spatial autocorrelation. The regression model depends on independence and heteroskedasticity of residuals. If spatial autocorrelation is present, then both rules are broken. Spatial autocorrelation is tested using the Global Moran’s I test, followed by mapping the Local Moran’s I. Spatial clustering is revealed by the Local Indicator of Spatial Association (LISA) map. The Lagrange Multiplier test is consulted to determine if spatial error or spatial lag is driving spatial autocorrelation in the model. Based on the Lagrange Multiplier results, the spatial [lag/error] model is used to try to produce a better model.</p>
 <div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = AAMR_all_ICDI_use ~ pct_white + pct_black + pct_hispanic + 
+    pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + 
+    entropy + HDD + PCP, data = c_df6_a)
 
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-2.5382 -0.4207 -0.0241  0.3785  3.6923 
+
+Coefficients:
+                Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)   -3.145e-16  1.237e-02   0.000   1.0000    
+pct_white      1.313e-01  2.770e-02   4.741 2.22e-06 ***
+pct_black      2.856e-02  2.901e-02   0.984   0.3250    
+pct_hispanic  -2.008e-01  1.826e-02 -11.002  &lt; 2e-16 ***
+pct_bach      -2.595e-01  1.931e-02 -13.441  &lt; 2e-16 ***
+pct_pov        1.580e-01  2.148e-02   7.355 2.47e-13 ***
+PM2.5          2.026e-02  1.427e-02   1.420   0.1557    
+pct_smokers    2.350e-01  2.167e-02  10.845  &lt; 2e-16 ***
+pct_obese      1.252e-01  1.947e-02   6.430 1.49e-10 ***
+pct_uninsured  1.598e-02  1.843e-02   0.867   0.3861    
+entropy        3.873e-02  1.432e-02   2.704   0.0069 ** 
+HDD           -2.516e-01  1.976e-02 -12.737  &lt; 2e-16 ***
+PCP           -7.203e-02  1.742e-02  -4.135 3.65e-05 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.6705 on 2926 degrees of freedom
+Multiple R-squared:  0.5522,    Adjusted R-squared:  0.5504 
+F-statistic: 300.7 on 12 and 2926 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = AAMR_all_ICDI65_use ~ pct_white + pct_black + pct_hispanic + 
+    pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + 
+    entropy + HDD + PCP, data = c_df6_b)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.0355 -0.4742 -0.0108  0.4233  4.6530 
+
+Coefficients:
+                Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)   -1.867e-16  1.410e-02   0.000 1.000000    
+pct_white      1.279e-01  3.158e-02   4.048 5.29e-05 ***
+pct_black     -2.729e-02  3.308e-02  -0.825 0.409393    
+pct_hispanic  -1.721e-01  2.081e-02  -8.270  &lt; 2e-16 ***
+pct_bach      -2.659e-01  2.201e-02 -12.078  &lt; 2e-16 ***
+pct_pov        9.325e-02  2.450e-02   3.807 0.000144 ***
+PM2.5          4.404e-02  1.627e-02   2.707 0.006826 ** 
+pct_smokers    2.037e-01  2.471e-02   8.245 2.47e-16 ***
+pct_obese      1.375e-01  2.220e-02   6.195 6.65e-10 ***
+pct_uninsured  5.059e-03  2.102e-02   0.241 0.809789    
+entropy        3.495e-02  1.633e-02   2.140 0.032412 *  
+HDD           -2.096e-01  2.253e-02  -9.307  &lt; 2e-16 ***
+PCP           -8.011e-02  1.986e-02  -4.033 5.64e-05 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.7645 on 2926 degrees of freedom
+Multiple R-squared:  0.4179,    Adjusted R-squared:  0.4155 
+F-statistic: 175.1 on 12 and 2926 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Global Moran I for regression residuals
+
+data:  
+model: lm(formula = AAMR_all_ICDI_use ~ pct_white + pct_black +
+pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
+pct_uninsured + entropy + HDD + PCP, data = c_df6_a)
+weights: df_1a_wt4
+
+Moran I statistic standard deviate = 22.88, p-value &lt; 2.2e-16
+alternative hypothesis: greater
+sample estimates:
+Observed Moran I      Expectation         Variance 
+    0.2829361678    -0.0028447414     0.0001560063 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Global Moran I for regression residuals
+
+data:  
+model: lm(formula = AAMR_all_ICDI_use ~ pct_white + pct_black +
+pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
+pct_uninsured + entropy + HDD + PCP, data = c_df6_a)
+weights: df_1a_wt6
+
+Moran I statistic standard deviate = 25.92, p-value &lt; 2.2e-16
+alternative hypothesis: greater
+sample estimates:
+Observed Moran I      Expectation         Variance 
+    0.2624987188    -0.0027549107     0.0001047241 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Global Moran I for regression residuals
+
+data:  
+model: lm(formula = AAMR_all_ICDI_use ~ pct_white + pct_black +
+pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
+pct_uninsured + entropy + HDD + PCP, data = c_df6_a)
+weights: df_1a_wt10
+
+Moran I statistic standard deviate = 31.256, p-value &lt; 2.2e-16
+alternative hypothesis: greater
+sample estimates:
+Observed Moran I      Expectation         Variance 
+    2.436686e-01    -2.632575e-03     6.209815e-05 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Global Moran I for regression residuals
+
+data:  
+model: lm(formula = AAMR_all_ICDI65_use ~ pct_white + pct_black +
+pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
+pct_uninsured + entropy + HDD + PCP, data = c_df6_b)
+weights: df_1b_wt4
+
+Moran I statistic standard deviate = 18.739, p-value &lt; 2.2e-16
+alternative hypothesis: greater
+sample estimates:
+Observed Moran I      Expectation         Variance 
+    0.2312083561    -0.0028447414     0.0001560063 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Global Moran I for regression residuals
+
+data:  
+model: lm(formula = AAMR_all_ICDI65_use ~ pct_white + pct_black +
+pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
+pct_uninsured + entropy + HDD + PCP, data = c_df6_b)
+weights: df_1b_wt6
+
+Moran I statistic standard deviate = 21.093, p-value &lt; 2.2e-16
+alternative hypothesis: greater
+sample estimates:
+Observed Moran I      Expectation         Variance 
+    0.2130990639    -0.0027549107     0.0001047241 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Global Moran I for regression residuals
+
+data:  
+model: lm(formula = AAMR_all_ICDI65_use ~ pct_white + pct_black +
+pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
+pct_uninsured + entropy + HDD + PCP, data = c_df6_b)
+weights: df_1b_wt10
+
+Moran I statistic standard deviate = 26.365, p-value &lt; 2.2e-16
+alternative hypothesis: greater
+sample estimates:
+Observed Moran I      Expectation         Variance 
+    2.051312e-01    -2.632575e-03     6.209815e-05 </code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="intro_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="intro_files/figure-html/unnamed-chunk-18-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="intro_files/figure-html/unnamed-chunk-18-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="intro_files/figure-html/unnamed-chunk-18-4.png" class="img-fluid" width="672"></p>
+</div>
 </div>
 <hr>
 
