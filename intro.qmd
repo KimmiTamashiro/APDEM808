@@ -1267,12 +1267,11 @@ c_prep5$forest <- c_prep5$PROP41 + c_prep5$PROP42 + c_prep5$PROP43 # decidious, 
 c_prep5$shrubland <- c_prep5$PROP52 #shrub
 c_prep5$herbaceous <- c_prep5$PROP71 #sedge
 c_prep5$planted <- c_prep5$PROP81 + c_prep5$PROP82 #pasture, crops
-c_prep5$wetlands <- c_prep5$PROP90 + c_prep5$PROP95 #woody, emergeny herbaceous
+c_prep5$wetlands <- c_prep5$PROP90 + c_prep5$PROP95 #woody, emergent herbaceous
 
-# 3/5/23 comment out this section; moving to national view
-# #filter on target regions only
-# c_prep4<-c_prep3%>%
-#   filter(reg_names%in%c("W","SE","OV","NW"))
+#prep columns for alternate entropy view
+c_prep5$all_else<- 1 - (c_prep5$PROP21 + c_prep5$PROP22 + c_prep5$PROP23 + c_prep5$PROP24) #all but developed types
+c_prep5 <- c_prep5 %>% rename(dev_open = PROP21, dev_low = PROP22, dev_med = PROP23, dev_high = PROP24)
 
 # load the NLCD legend from FedData package
 legend<-pal_nlcd()
@@ -1280,10 +1279,14 @@ variable<-paste("PROP",legend$ID,sep="")
 legend_box<-cbind(legend,variable)
 
 #reshape for box plots
-US_box1<-subset(c_prep5,select=c(1:2,48,65:73))
+US_box1<-subset(c_prep5,select=c(1:2,48,65:73)) #entropy all major categories
+US_box2<-subset(c_prep5,select=c(1:2,48,51:54,73)) #entropy focused on developed types
 
 #careful of reshape2 warning
 US_box1<-reshape2::melt(US_box1,id.vars=c('cofips','NAME','reg_names'),measure.vars=c('water','developed','barren','forest','shrubland','herbaceous','planted','wetlands'))
+
+#careful of reshape2 warning
+US_box2<-reshape2::melt(US_box2,id.vars=c('cofips','NAME','reg_names'),measure.vars=c('dev_open','dev_low','dev_med','dev_high','all_else'))
 
 ############REPEAT FOR FIRST REGION################
 
@@ -1482,23 +1485,39 @@ $$
 ```{r}
 #add entropy index
 entropy <- aggregate(US_box1$value * log(US_box1$value), by = list(US_box1$cofips), FUN = sum)
+entropy_dev <- aggregate(US_box2$value * log(US_box2$value), by = list(US_box2$cofips), FUN = sum)
 
 colnames(entropy) <- c("cofips","entropy_prep")
 entropy$entropy <- (entropy$entropy_prep *-1) / log(8)
 entropy<-entropy[,-c(2)]
 
+colnames(entropy_dev) <- c("cofips","entropy_dev_prep")
+entropy_dev$entropy_dev <- as.numeric((entropy_dev$entropy_dev_prep *-1) / log(5))
+entropy_dev<-entropy_dev[,-c(2)]
+
 #merge entropy index to cprep
 c_prep6 <- left_join(c_prep5,entropy, by = "cofips")
+c_prep6 <- left_join(c_prep6,entropy_dev, by = "cofips")
 
 #plot entropy
 c_prep6%>%
   mutate(entropy= cut(entropy, breaks=quantile(entropy, p=seq(0,1,length.out = 6), na.rm=T ), include.lowest=T ))%>%
   ggplot()+geom_sf(aes(fill=entropy,color=NA))+
   scale_colour_viridis_d()+
-  scale_fill_viridis_d(option = "cividis",direction = -1, na.value="grey15")+
+  scale_fill_viridis_d(option = "cividis",direction = -1, na.value="white")+
   scale_y_continuous(label=scales::comma)+
   geom_sf(data=sts, color="black")+
   ggtitle("Land Use Entropy Index by County", subtitle = "NLCD 2011")
+
+#plot entropy
+c_prep6%>%
+  mutate(entropy_dev= cut(entropy_dev, breaks=quantile(entropy_dev, p=seq(0,1,length.out = 6), na.rm=T ), include.lowest=T ))%>%
+  ggplot()+geom_sf(aes(fill=entropy_dev,color=NA))+
+  scale_colour_viridis_d()+
+  scale_fill_viridis_d(option = "cividis",direction = -1, na.value="white")+
+  scale_y_continuous(label=scales::comma)+
+  geom_sf(data=sts, color="black")+
+  ggtitle("Land Use Entropy Index by County- Developed Focus", subtitle = "NLCD 2011")
 
 ```
 
