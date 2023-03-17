@@ -63,7 +63,7 @@ Scale considerations are a challenge in all spatial analyses, therefore it is no
 
 This research uses U.S. age-adjusted mortality rates from cardiovascular and respiratory diseases (defined as ICD-10 codes I00-I99 and J00 - J98) as the health indicator. In Mueller and colleagues' literature analysis on greenspace and respiratory health research, they found that respiratory mortality had the most consistent positive evidence as compared to research measuring other health indicators, including asthma, lung function, hospital admissions, among other measures [@mueller2022, pp. 28]. Using mortality rates from cardiovascular and respiratory diseases will capture acute and chronic conditions that can be impacted by instances of severe drops in air quality and more moderate yet sustained air quality issues.
 
-## Relationship Between Health and Place
+## Relationship Between Health and Place 
 
 One reason why it is difficult to prove a causal relationship between environmental risk factors such as air pollution and a health outcome is because health outcomes can be cumulative results of a combination of factors. When considering air pollution's impact on health, one such factor are air pollution's exposure pathways. Exposure can vary depending on distance from sources of pollution and the amount of time spent breathing in pollutants, both of which can fluctuate when considering climate, ventilation, time spent outdoors, among other factors. Arguably the simplest way to measure exposure is by measuring proximity to pollutant sources. However, spatial analysis of epidemiological phenomena should consider more than just geographic location. This is because an individual's activity spaces are not simply a feature of that person, but a reflection of a myriad of influences that result in an individuals' choice to frequent those spaces. Entwisle highlights this topic in *Putting People into Place,* arguing that there is a critical need to "incorporate agency in theories of neighborhood and health," [@entwisle2007, pp. 699]. Entwisle identifies the symbiotic relationship between individuals' opportunities, social interactions, BLAH that inform decisions to move to or remain in a space, and how that informs health decisions. She also acknowledges that individuals can influence their communities. Bernard and colleagues build on this notion by formalizing a conceptualization of neighborhoods. Their framework identifies four primary influences on access to health-related resources: "proximity, rights, prices, and informal reciprocity," [@bernard2007, pp. 1849]. WRAP ABOUT HOW THIS RELATES.
 
@@ -1721,6 +1721,7 @@ summary(fit_df2_a_err)
 summary(fit_df2_b_err)
 
 #evaluate compared to OLS model. Are Residual mean squared and AIC smaller? Smaller the better for both
+#adding note so i can push to git
 
 ```
 
