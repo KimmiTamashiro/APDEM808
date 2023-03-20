@@ -63,7 +63,7 @@ Scale considerations are a challenge in all spatial analyses, therefore it is no
 
 This research uses U.S. age-adjusted mortality rates from cardiovascular and respiratory diseases (defined as ICD-10 codes I00-I99 and J00 - J98) as the health indicator. In Mueller and colleagues' literature analysis on greenspace and respiratory health research, they found that respiratory mortality had the most consistent positive evidence as compared to research measuring other health indicators, including asthma, lung function, hospital admissions, among other measures [@mueller2022, pp. 28]. Using mortality rates from cardiovascular and respiratory diseases will capture acute and chronic conditions that can be impacted by instances of severe drops in air quality and more moderate yet sustained air quality issues.
 
-## Relationship Between Health and Place 
+## Relationship Between Health and Place
 
 One reason why it is difficult to prove a causal relationship between environmental risk factors such as air pollution and a health outcome is because health outcomes can be cumulative results of a combination of factors. When considering air pollution's impact on health, one such factor are air pollution's exposure pathways. Exposure can vary depending on distance from sources of pollution and the amount of time spent breathing in pollutants, both of which can fluctuate when considering climate, ventilation, time spent outdoors, among other factors. Arguably the simplest way to measure exposure is by measuring proximity to pollutant sources. However, spatial analysis of epidemiological phenomena should consider more than just geographic location. This is because an individual's activity spaces are not simply a feature of that person, but a reflection of a myriad of influences that result in an individuals' choice to frequent those spaces. Entwisle highlights this topic in *Putting People into Place,* arguing that there is a critical need to "incorporate agency in theories of neighborhood and health," [@entwisle2007, pp. 699]. Entwisle identifies the symbiotic relationship between individuals' opportunities, social interactions, BLAH that inform decisions to move to or remain in a space, and how that informs health decisions. She also acknowledges that individuals can influence their communities. Bernard and colleagues build on this notion by formalizing a conceptualization of neighborhoods. Their framework identifies four primary influences on access to health-related resources: "proximity, rights, prices, and informal reciprocity," [@bernard2007, pp. 1849]. WRAP ABOUT HOW THIS RELATES.
 
@@ -73,7 +73,11 @@ The fact that this research fails to acknowledge the role that individuals' play
 
 ## Data and Methods
 
-Data fall into four major categories: health, demographic, air pollution, and land use. However, since this is a spatial analysis, the common thread in all data sources is the spatial linkage. Spatial evaluation of air pollution's impact on health is considered on a regional level. Following the approach that Simon and colleagues take to evaluate ozone trends in the U.S., this analysis also uses NOAA climate regions in the analysis of air pollution [-@simon2015]. Evaluation of data on a regional scale lowers the model's sensitivity to factors such as wind, climate, and pollutants' chemical reactions with other molecules in the air that can cause the concentration of air pollution to change [@simon2015, pp 186, pp. 188]. To this end, four regions were selected for this research, which represent different climate areas and a wide variety of land cover types.
+Data fall into four major categories: health, demographic, air pollution, and land use. However, since this is a spatial analysis, the common thread in all data sources is the spatial linkage. Spatial evaluation of air pollution's impact on health is considered on a regional level. Following the approach that Simon and colleagues take to evaluate ozone trends in the U.S., this analysis also uses NOAA climate regions to summarize the analysis air pollution [-@simon2015]. Evaluation of data on a regional scale is conceptually supported due to the NOAA climate region categorization of areas with similar wind, climate, and emissions sources, which all can influence the concentration of air pollution [@simon2015, pp 186, pp. 188]. Additionally, in an acknowledgement of the environmental factors that influence both air pollution and health impacts, the model includes select annual, county-level climate variables.
+
+This research focuses on particulate matter (PM) 2.5 measures from 2015, as captured by the Environmental Protection Agency (EPA) and further manipulated by the Centers for Disease Control and Prevention (CDC). PM 2.5 are "fine, inhalable particles with diameters that are generally 2.5 micrometers or smaller," that have been linked to various complications with lung and heart functions [@usepa2016]. The EPA publishes extensive amounts of air quality data, which are accessible through their Air Data website. Available data include annual summaries by monitor.
+
+Figure 1 plots the 2015 annual PM 2.5 measures across the contiguous U.S. to provide a geographic reference for monitor locations and start to visually represent the variation in PM 2.5 measurements by region. A visual inspection of Figure 1 reveals how monitors are distributed throughout each region and their individual readings. It is noted that monitors are highly concentrated in certain areas (for example, the New Jersey to Massachusetts area) and few and far between in others (for example, in the Western landlocked states). This observation leads to the acknowledgement of potential spatial bias: monitors are not normally distributed throughout space, therefore spatial bias may be introduced due to the distribution of data across the measurement areas. However, the level of spatial bias difficult to measure due to this model's use of CDC-modeled data.
 
 ```{r}
 #| fig-cap: Figure 1; Annual summary of air quality metrics by monitoring site from 2014 - 2016
@@ -175,214 +179,11 @@ airQ_prep1 <-cbind(st_vec_airQ,co_vec_airQ,airQ_15_PM)
 airQ_prep2 <-airQ_prep1[,-c(3,4)]
 ```
 
-This research focuses on particulate matter (PM) 2.5 measures from 2015, as captured by the Environmental Protection Agency (EPA) and further manipulated by the Centers for Disease Control and Prevention (CDC). PM 2.5 are "fine, inhalable particles with diameters that are generally 2.5 micrometers or smaller," that have been linked to various complications with lung and heart functions [@usepa2016]. The EPA publishes extensive amounts of air quality data, which are accessible through their Air Data website. Available data include annual summaries by monitor.
-
-Figure 1 plots the 2015 annual PM 2.5 measures on region-dependent scales by NOAA Climate region to provide a geographic reference for monitor locations and start to visually represent the variation in PM 2.5 measurements by region. The entire contiguous U.S. is represented in Figure 1, but it is worth noting that only the Northwest, West, Ohio Valley, and Southeast NOAA Climate Regions were selected for this study. These regions were selected due to their climatic variation, regional air quality variation, and either high presence or decent distribution of air quality monitors. A visual inspection of Figure 1 reveals how monitors are distributed throughout each region and their individual readings. It is noted that though the West region has a relative abundance of monitors in California, monitors are sparse in Nevada. This observation leads to the acknowledgement of potential spatial bias: monitors are not normally distributed throughout space, therefore spatial bias may be introduced due to the distribution of data across the measurement areas. However, the level of spatial bias difficult to measure due to the use of the CDC's modeled data.
-
-```{r}
-#| fig-width: 10
-#| fig-height: 8
-#| fig-cap: Figure 2; Average Annual PM 2.5 by region. Regional P.M 2.5 levels plotted on different scales.
-
-# #start prepping for region plots
-# sts_NE<- sts%>%filter(STATEFP%in%NE) 
-# 
-# #plot data airq 2015
-# NE_dat<-airQ_prep2%>%
-#   filter(st_vec_airQ%in%NE)
-# 
-# NE_plot<-ggplot(acs)+geom_sf(data=sts_NE, color="black")+
-#   geom_point(data=NE_dat,
-#              aes(x = Longitude, y = Latitude),
-#              fill = "transparent",
-#              colour = "black",
-#              size = 1.5)+
-#   geom_point(data = NE_dat,
-#              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
-#              size = 1)+
-#   scale_color_gradient(low = "yellow", high = "navy", name = 'PM2.5')+
-#   labs(x=NULL, y=NULL) +
-#   guides(x="none",y="none") +
-#   ggtitle("Air Quality: Northeast", subtitle = "U.S. EPA, 2015")
-# 
-# #start prepping for region plots
-# sts_NR<- sts%>%filter(STATEFP%in%NR) #exclude those outside of continental US
-# 
-# #plot data airq 2015
-# NR_dat<-airQ_prep2%>%
-#   filter(st_vec_airQ%in%NR)
-# 
-# NR_plot<-ggplot(acs)+geom_sf(data=sts_NR, color="black")+
-#   geom_point(data=NR_dat,
-#              aes(x = Longitude, y = Latitude),
-#              fill = "transparent",
-#              colour = "black",
-#              size = 1.5)+
-#   geom_point(data = NR_dat,
-#              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
-#              size = 1)+
-#   scale_color_gradient(low = "yellow", high = "navy", name = 'PM2.5')+
-#   labs(x=NULL, y=NULL) +
-#   guides(x="none",y="none") +
-#   ggtitle("Air Quality: Northern Rockies", subtitle = "U.S. EPA, 2015")
-# 
-# #start prepping for region plots
-# sts_W<- sts%>%filter(STATEFP%in%W) #exclude those outside of continental US
-# 
-# #plot data airq 2015
-# W_dat<-airQ_prep2%>%
-#   filter(st_vec_airQ%in%W)
-# 
-# W_plot<-ggplot(acs)+geom_sf(data=sts_W, color="black")+
-#   geom_point(data=W_dat,
-#              aes(x = Longitude, y = Latitude),
-#              fill = "transparent",
-#              colour = "black",
-#              size = 1.5)+
-#   geom_point(data = W_dat,
-#              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
-#              size = 1)+
-#   scale_color_gradient(low = "yellow", high = "navy", name = 'PM2.5')+
-#   labs(x=NULL, y=NULL) +
-#   guides(x="none",y="none") +
-#   ggtitle("Air Quality: West", subtitle = "U.S. EPA, 2015")
-# 
-# #start prepping for region plots
-# sts_UM<- sts%>%filter(STATEFP%in%UM) #exclude those outside of continental US
-# 
-# #plot data airq 2015
-# UM_dat<-airQ_prep2%>%
-#   filter(st_vec_airQ%in%UM)
-# 
-# UM_plot<-ggplot(acs)+geom_sf(data=sts_UM, color="black")+
-#   geom_point(data=UM_dat,
-#              aes(x = Longitude, y = Latitude),
-#              fill = "transparent",
-#              colour = "black",
-#              size = 1.5)+
-#   geom_point(data = UM_dat,
-#              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
-#              size = 1)+
-#   scale_color_gradient(low = "yellow", high = "navy", name = 'PM2.5')+
-#   labs(x=NULL, y=NULL) +
-#   guides(x="none",y="none") +
-#   ggtitle("Air Quality: Upper Midwest", subtitle = "U.S. EPA, 2015")
-# 
-# #start prepping for region plots
-# sts_OV<- sts%>%filter(STATEFP%in%OV) #exclude those outside of continental US
-# 
-# #plot data airq 2015
-# OV_dat<-airQ_prep2%>%
-#   filter(st_vec_airQ%in%OV)
-# 
-# OV_plot<-ggplot(acs)+geom_sf(data=sts_OV, color="black")+
-#   geom_point(data=OV_dat,
-#              aes(x = Longitude, y = Latitude),
-#              fill = "transparent",
-#              colour = "black",
-#              size = 1.5)+
-#   geom_point(data = OV_dat,
-#              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
-#              size = 1)+
-#   scale_color_gradient(low = "yellow", high = "navy", name = 'PM2.5')+
-#   labs(x=NULL, y=NULL) +
-#   guides(x="none",y="none") +
-#   ggtitle("Air Quality: Ohio Valley", subtitle = "U.S. EPA, 2015")
-# 
-# #start prepping for region plots
-# sts_S<- sts%>%filter(STATEFP%in%S) #exclude those outside of continental US
-# 
-# #plot data airq 2015
-# S_dat<-airQ_prep2%>%
-#   filter(st_vec_airQ%in%S)
-# 
-# S_plot<-ggplot(acs)+geom_sf(data=sts_S, color="black")+
-#   geom_point(data=S_dat,
-#              aes(x = Longitude, y = Latitude),
-#              fill = "transparent",
-#              colour = "black",
-#              size = 1.5)+
-#   geom_point(data = S_dat,
-#              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
-#              size = 1)+
-#   scale_color_gradient(low = "yellow", high = "navy", name = 'PM2.5')+
-#   labs(x=NULL, y=NULL) +
-#   guides(x="none",y="none") +
-#   ggtitle("Air Quality: South", subtitle = "U.S. EPA, 2015")
-# 
-# #start prepping for region plots
-# sts_SE<- sts%>%filter(STATEFP%in%SE) #exclude those outside of continental US
-# 
-# #plot data airq 2015
-# SE_dat<-airQ_prep2%>%
-#   filter(st_vec_airQ%in%SE)
-# 
-# SE_plot<-ggplot(acs)+geom_sf(data=sts_SE, color="black")+
-#   geom_point(data=SE_dat,
-#              aes(x = Longitude, y = Latitude),
-#              fill = "transparent",
-#              colour = "black",
-#              size = 1.5)+
-#   geom_point(data = SE_dat,
-#              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
-#              size = 1)+
-#   scale_color_gradient(low = "yellow", high = "navy", name = 'PM2.5')+
-#   labs(x=NULL, y=NULL) +
-#   guides(x="none",y="none") +
-#   ggtitle("Air Quality: Southeast", subtitle = "U.S. EPA, 2015")
-# 
-# #start prepping for region plots
-# sts_SW<- sts%>%filter(STATEFP%in%SW) #exclude those outside of continental US
-# 
-# #plot data airq 2015
-# SW_dat<-airQ_prep2%>%
-#   filter(st_vec_airQ%in%SW)
-# 
-# SW_plot<-ggplot(acs)+geom_sf(data=sts_SW, color="black")+
-#   geom_point(data=SW_dat,
-#              aes(x = Longitude, y = Latitude),
-#              fill = "transparent",
-#              colour = "black",
-#              size = 1.5)+
-#   geom_point(data = SW_dat,
-#              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
-#              size = 1)+
-#   scale_color_gradient(low = "yellow", high = "navy", name = 'PM2.5')+
-#   labs(x=NULL, y=NULL) +
-#   guides(x="none",y="none") +
-#   ggtitle("Air Quality: Southwest", subtitle = "U.S. EPA, 2015")
-# 
-# #start prepping for region plots
-# sts_NW<- sts%>%filter(STATEFP%in%NW) #exclude those outside of continental US
-# 
-# #plot data airq 2015
-# NW_dat<-airQ_prep2%>%
-#   filter(st_vec_airQ%in%NW)
-# 
-# NW_plot<-ggplot(acs)+geom_sf(data=sts_NW, color="black")+
-#   geom_point(data=NW_dat,
-#              aes(x = Longitude, y = Latitude),
-#              fill = "transparent",
-#              colour = "black",
-#              size = 1.5)+
-#   geom_point(data = NW_dat,
-#              aes(x = Longitude, y = Latitude, colour = Arithmetic.Mean),
-#              size = 1)+
-#   scale_color_gradient(low = "yellow", high = "navy", name = 'PM2.5')+
-#   labs(x=NULL, y=NULL) +
-#   guides(x="none",y="none") +
-#   ggtitle("Air Quality: Northwest", subtitle = "U.S. EPA, 2015")
-# 
-# #map all 2015 Air Quality data
-# cowplot::plot_grid(NW_plot, NR_plot, NE_plot, W_plot, SW_plot, UM_plot, OV_plot, S_plot, SE_plot)
-
-```
-
 The CDC provides measured and modeled PM 2.5 data by county for the U.S., as depicted in Figure 2. They derive their data from daily PM 2.5 measurements produced by the EPA, then further model to infer measurements for areas where there are gaps in the data. Derivations are primarily based on the Downscaler (DS) model, which is "a statistical fusion of monitoring data and Community Multiscale Air Quality (CMAQ) outputs," \[\@geograph\]. While use of this data is convenient, a future iteration of this research will produce and employ a PM 2.5 inference model, which would be produced specifically for this research. Doing so would control for any unknowns that are introduced due to the limitations of using modeled data that is not easily reproducible.
 
 One limitation of the air quality data used in this model is the use of annually summarized data. While useful, annual summaries may not be sensitive enough to capture acute changes in air quality, which pose a health risk (CITE?). This relationship may not be captured in the model if poor air quality days are infrequent enough to impact the mean. For simplicity, this research does not take seasonality into consideration and instead uses annual averages, which does not accurately reflect variation in air pollution ranges.
 
-DESCRIBE FIGURE 2
+TALK ABOUT HOW THIS YEAR COMPARES TO OTHER YEARS
 
 ```{r}
 #| fig-width: 10
@@ -486,53 +287,54 @@ c_prep2%>%
   geom_sf(data=sts, color="black")+
   ggtitle("Monitored & Modeled PM 2.5 Levels by County", subtitle = "CDC National Environmental Public Health Tracking Data, 2015")
 
-
-# #prep county airQ data; add leading zeroes to state and county
-# airQ_vec_c <- airQ_county%>% pull(County.Code)
-# co_vec_airQ <-sprintf("%05d",as.numeric(airQ_vec_c))
-# 
-# 
-# airQ_c_prep1 <-cbind(co_vec_airQ,airQ_county)
-# airQ_c_prep2 <-airQ_c_prep1[,-c(2)]%>%
-#   rename(cofips=co_vec_airQ)%>%
-#   mutate(across(c(CO.2nd.Max.1.hr:Lead.Max.3.Mo.Avg), na_if, '.'))
-# 
-# #convert target col values from character to numeric
-# cols.num <- c("PM2.5.Weighted.Mean.24.hr","Ozone.2nd.Max.1.hr")
-# airQ_c_prep2[cols.num] <- sapply(airQ_c_prep2[cols.num],as.numeric)
-# 
-# #join to the rest of county level data
-# c_prep1 <- left_join(prep1,airQ_c_prep2, by="cofips")
-# c_prep2 <- subset(c_prep1,select = -c(8:12,14,24))
-# 
-# #map pollution indicators
-# 
-# #State Outlines for when we map the results...
-# options(tigris_class = "sf")
-# sts<- tigris::states(cb=T, year = 2016 )
-# sts<- st_boundary(sts)%>%
-#   st_transform(crs = 2163)%>%
-#   filter(!STATEFP%in%non_US) #exclude those outside of continental US
-# 
-# airQ_c_plot1 <-c_prep2%>%
-#   mutate(PM= cut(PM2.5.Weighted.Mean.24.hr, breaks=quantile(PM2.5.Weighted.Mean.24.hr, p=seq(0,1,length.out = 6), na.rm=T), include.lowest=T ))%>%
-#   ggplot()+geom_sf(aes(fill=PM,color=NA))+
-#   scale_color_brewer("Blues")+
-#   scale_fill_brewer(palette = "Blues", na.value="grey50")+
-#   geom_sf(data=sts, color="black")+
-#   ggtitle("24 hour average PM 2.5 Levels by County", subtitle = "US EPA, 2015")
-# 
-# airQ_c_plot2 <-c_prep2%>%
-#   mutate(Ozone= cut(Ozone.2nd.Max.1.hr, breaks=quantile(Ozone.2nd.Max.1.hr, p=seq(0,1,length.out = 4), na.rm=T), include.lowest=T ))%>%
-#   ggplot()+geom_sf(aes(fill=Ozone,color=NA))+
-#   scale_color_brewer("Blues")+
-#   scale_fill_brewer(palette = "Blues", na.value="grey50")+
-#   geom_sf(data=sts, color="black")+
-#   ggtitle("1-hour second max Ozone Levels by County", subtitle = "US EPA, 2015")
-# 
-# #map all 2015 Air Quality data
-# cowplot::plot_grid(airQ_c_plot1, airQ_c_plot2)
 ```
+
+Climate data are included in this model to account for impacts of environmental factors on PM2.5 levels. Research by Zhang and colleagues comparing daily PM2.5 measurements against various daily climate indicators found a strong positive relationship between high temperatures with increased PM2.5 concentration, with the highest correlation found in rural areas. An overwhleming pattern of overlap between extreme high PM2.5 levels and extreme heat days was found in most weather monitors across the country [@zhang2017, pp. 75]. They also found that days with extremely low relative humidity were associated with a higher probability of extreme PM 2.5 concentration [@zhang2017, p. 77]. This association is especially strong in the northern U.S. and Great Plains regions, which Zhang and colleagues attribute to relative humidity's impact on particle formation due to power plant emissions and agricultural activities [@zhang2017, pp. 75]. Though Zhang and colleagues found strong, statistically significant relationships, they also note that complexities exist between PM2.5 concentration and climate factors. Bell and colleagues highlight this point succintly in their analysis of PM2.5 components, noting that "the PM2.5 mixture varies strongly by region and by season, and the degree of spatial and temporaly variability varies by component," [@spatial, pp. 993]. At any given time, variations in the mixture of PM2.5 components may magnify or subdue expected reactions with climatic events.
+
+Climate can also impact health independently of its impact on air pollution. Research on cardiovascular and respiratory hospitalizations in Cyprus, Greece found significant correlations between increased hospitalizations and two climactic categories: "cold, cloudy days with increased levels of precipitation," and "warm, rainy days with increased levels of water vapor in the atmosphere," [@tsangari2016, pp. 251]. Their findings suggest depressed health on days when the climate causes discomfort: days when temperatures and humidity are high, as well as on cold days with increased precipitation. WRAP UP SENTENCE TO DRIVE HOME WHY CLIMATE IS AN IMPORTANT FACTOR.
+
+For ease of interpretation, climate data are summarized by NOAA climate region. Figure 3 is included as a reference to show which states are included in each region.
+
+```{r}
+#load US map shapefile for climate regions map
+options(tigris_class = "sf")
+sts2<- tigris::states(cb=T, year = 2015)
+sts2<- sts2%>%
+  st_transform(crs = 2163)%>%
+  filter(!STATEFP%in%non_US)
+
+# create a vector of colors to represent each region_group
+region_colors <- data.frame(
+  reg_names = c("NW","W","SW","NE","S","OV","UM","SE","NR"),
+  colors = c("#1f78b4", "#33a02c", "#e31a1c", "#ff7f00", "yellow","purple","pink", "magenta", "navy"))
+
+#State Outlines for when we map the results...
+sts2_region <- left_join(sts2,regions, by = "STATEFP")
+sts2_region <- left_join(sts2_region,region_colors, by = "reg_names")
+
+#plot map with region color-coding
+ggplot(sts2_region) +
+  geom_sf(aes(fill=colors, color = "gray35")) +
+  scale_fill_identity("Region", guide = "legend", labels = c("NW","W","SW","NE","SE","NR","UM","OV","S")) +
+  scale_color_identity() +
+  labs(title="NOAA Climate Regions") +
+  theme_void()
+
+#create and print table with state abbreviations
+sts2_region_tbl <- sts2_region %>%
+  group_by(reg_names) %>%
+  summarise(states = toString(STUSPS)) %>%
+  ungroup() %>%
+  st_set_geometry(NULL)
+  
+
+print(sts2_region_tbl)
+
+```
+
+Figure 4 displays climate variables of interest based on county groupings into NOAA climate regions. The box-and-whisker plots show the distribution of county-level climate in 2015. The top three plots show temperature trends in 2015 across the contiguous U.S. As expected, the areas with high average, maximum, and minimum temperatures are the South (S), Southeast (SE), and West (W) regions. The region with large variations in temperature indicators by county is the Southwest (SW). Though average temperatures for the region are lower than the other regions mentioned, there are a number of outliers whose average, minimum, and maximum temperatures in 2015 are significantly higher than the rest of the group. Climate regions with low minimum temperatures are the Northern Rockies (NR) and Upper Midwest (UM), whose mean minimum temperature is in the low thirties. By contrast, the South has the highest mean minimum temperature among its counties, averaging at fifty degrees.
+
+The bottom three plots display annual cooling degree days, heating degree days, and precipitation. Degree days are an indicator of the "demand for energy to heat or cool houses and businesses," indexed against a mean daily temperature of 65 degrees Fahrenheit [@climate]. Degree days are population weighted to better estimate the impact of temperature on human energy consumption [@climate]. The annual cooling and heating degree days are consistent with annual temperature trends. The relatively small interquartile ranges of cooling degree days by region suggest that cooling degree days are generally less varied, though there is a notable increase in high outliers in southern regions when comparing against the average annual temperature plot. The higher prevalence of these outliers implies two potential causes: either there is a small number of counties that have consistently higher temperatures than other counties in their respective regions or that areas with higher temperatures have high population densities (impacting the population weighting component of the degree day calculation). The annual precipitation plot shows that there is little variation in most regions: all but the Northwest (NW), South (S), and West (W) regions have fairly tight ranges. The Northwest shows the regional largest variance within its counties in 2015, encompassing counties on the low end when comparing across the entire contiguous U.S. while also including counties the extreme high end.
 
 ```{r}
 #| fig-width: 14
@@ -614,6 +416,8 @@ grid.arrange(plot_clim_tavg, plot_clim_tmin, plot_clim_tmax, plot_clim_cdd, plot
 
 ```
 
+To determine which of these climate indicators may be significant in the model, the below figures explore the relationship between annual PM 2.5 concentration and the various climate indicators. Figure 5 plots the six climate variables against PM 2.5 concentration for all counties. While there certainly is variation in the data points for the six climate variables, the PM 2.5 concentration nationally is much more uniform, resulting in significant, but low positive correlations for each set of variables.
+
 ```{r}
 #| fig-width: 12
 #| fig-height: 8
@@ -662,6 +466,10 @@ grid.arrange(plot_cor_tavg, plot_cor_tmin, plot_cor_tmax, plot_cor_cdd, plot_cor
              bottom = textGrob("PM 2.5 Concentration",gp=gpar(fontsize=15,font=3))
              )
 ```
+
+Plotting the data for the wide, national scope is not very meaningful. Instead, Figures 6 through 11 parses the data based on NOAA climate region to better evaluate nuances of the relationships between PM 2.5 concentration and climate variables. Notably, western regions (West, Northwest, and Southwest) have a smaller quantity of counties so they are grouped into one plot for the purposes of these visualizations.
+
+Cooling degree days does not appear to be have a significant relationship with PM 2.5 concentration in 2015, though there is a significant, moderately positive relationship between the two variables in the Upper Midwest.
 
 ```{r}
 #| fig-width: 12
@@ -739,11 +547,20 @@ plot_cor_cdd_OV <- c_prep4 %>%
   ggscatter(x = "PM2.5", y = "CDD", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
-          titale = "Ohio Valley",
+          title = "Ohio Valley",
+          xlab = "", ylab = "")
+
+#Western regions have too few N so plotting together
+plot_cor_cdd_WEST <- c_prep4 %>%
+  filter(reg_names%in%c("W","NW","SW"))%>%
+  ggscatter(x = "PM2.5", y = "CDD", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Northwest-West-Southwest",
           xlab = "", ylab = "")
 
 #plot
-grid.arrange(plot_cor_cdd_NW, plot_cor_cdd_W, plot_cor_cdd_NR, plot_cor_cdd_SW, plot_cor_cdd_UM, plot_cor_cdd_S, plot_cor_cdd_OV, plot_cor_cdd_SE, plot_cor_cdd_NE,
+grid.arrange(plot_cor_cdd_WEST, plot_cor_cdd_NR, plot_cor_cdd_UM, plot_cor_cdd_S, plot_cor_cdd_OV, plot_cor_cdd_SE, plot_cor_cdd_NE,
              ncol = 3, nrow=3,
              top = textGrob("Correlation: PM 2.5 Level and Cooling Degree Days",gp=gpar(fontsize=18,font=3)),
              left = textGrob("Cooling Degree Days",rot = 90,gp=gpar(fontsize=15,font=3)),
@@ -752,6 +569,8 @@ grid.arrange(plot_cor_cdd_NW, plot_cor_cdd_W, plot_cor_cdd_NR, plot_cor_cdd_SW, 
 
 
 ```
+
+The correlations between PM 2.5 concentration and maximum temperature are significant positive in the Upper Midwest (R=0.68) and Northeast (R=0.5). Interestingly, in Ohio Valley the relationship is significant and moderately negative (R=-0.41). This indicates that in the Ohio Valley region, counties with lower maximum temperatures in 2015 also tended to have higher annual PM 2.5 levels. A visual inspection of the Ohio Valley plot reveals that there is a relatively wide range of maximum temperatures in the Ohio Valley region but a small and dense range of PM 2.5 concentrations in this area.
 
 ```{r}
 #| fig-width: 12
@@ -795,7 +614,7 @@ plot_cor_tmax_UM <- c_prep4 %>%
   ggscatter(x = "PM2.5", y = "TMAX", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
-          title = "Midwest",
+          title = "Upper Midwest",
           xlab = "", ylab = "")
 
 plot_cor_tmax_S <- c_prep4 %>%
@@ -830,15 +649,26 @@ plot_cor_tmax_OV <- c_prep4 %>%
           title = "Ohio Valley",
           xlab = "", ylab = "")
 
+#Western regions have too few N so plotting together
+plot_cor_tmax_WEST <- c_prep4 %>%
+  filter(reg_names%in%c("W","NW","SW"))%>%
+  ggscatter(x = "PM2.5", y = "TMAX", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Northwest-West-Southwest",
+          xlab = "", ylab = "")
+
 
 #plot
-grid.arrange(plot_cor_tmax_NW, plot_cor_tmax_W, plot_cor_tmax_NR, plot_cor_tmax_SW, plot_cor_tmax_UM, plot_cor_tmax_S, plot_cor_tmax_OV, plot_cor_tmax_SE, plot_cor_tmax_NE,
+grid.arrange(plot_cor_tmax_WEST, plot_cor_tmax_NR, plot_cor_tmax_UM, plot_cor_tmax_S, plot_cor_tmax_OV, plot_cor_tmax_SE, plot_cor_tmax_NE,
              ncol = 3, nrow=3,
              top = textGrob("Correlation: PM 2.5 Level and Maximum Temp",gp=gpar(fontsize=20,font=3)),
              left = textGrob("Max Temp (Degrees Farenheit)",rot = 90),
              bottom = textGrob("PM2.5 Concentration")
              )
 ```
+
+Heating degree days and PM 2.5 concentrations show similar relationships in the Upper Midwest region (R=0.73) and Ohio Valley (R = -0.39). The two variables in both of these regions show a significant relationship, though in the Upper Midwest, that relationship is strongly positive, and in Ohio Valley, it is moderately negative. The other regions do not seem to have significant relationships.
 
 ```{r}
 #| fig-width: 12
@@ -917,8 +747,17 @@ plot_cor_hdd_OV <- c_prep4 %>%
           title = "Ohio Valley",
           xlab = "", ylab = "")
 
+#Western regions have too few N so plotting together
+plot_cor_hdd_WEST <- c_prep4 %>%
+  filter(reg_names%in%c("W","NW","SW"))%>%
+  ggscatter(x = "PM2.5", y = "HDD", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Northwest-West-Southwest",
+          xlab = "", ylab = "")
+
 #plot
-grid.arrange(plot_cor_hdd_NW, plot_cor_hdd_W, plot_cor_hdd_NR, plot_cor_hdd_SW, plot_cor_hdd_UM, plot_cor_hdd_S, plot_cor_hdd_OV, plot_cor_hdd_SE, plot_cor_hdd_NE,
+grid.arrange(plot_cor_hdd_WEST, plot_cor_hdd_NR, plot_cor_hdd_UM, plot_cor_hdd_S, plot_cor_hdd_OV, plot_cor_hdd_SE, plot_cor_hdd_NE,
              ncol = 3, nrow=3,
              top = textGrob("Correlation: PM 2.5 Level and Heating Degree Days by County",gp=gpar(fontsize=18,font=3)),
              left = textGrob("Heating Degree Days", rot = 90,gp=gpar(fontsize=15,font=3)),
@@ -926,91 +765,104 @@ grid.arrange(plot_cor_hdd_NW, plot_cor_hdd_W, plot_cor_hdd_NR, plot_cor_hdd_SW, 
              )
 ```
 
+The Upper Midwest region and the South both show significant, positive relationships between minimum temperature and PM 2.5 concentration.
+
 ```{r}
 #| fig-width: 12
 #| fig-height: 12
 #| fig-cap: Figure 9; UPDATE CAPTION
 
-plot_cor_tmax_W <- c_prep4 %>%
+plot_cor_tmin_W <- c_prep4 %>%
   filter(reg_names%in%c("W"))%>%
-  ggscatter(x = "PM2.5", y = "HDD", 
+  ggscatter(x = "PM2.5", y = "TMIN", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
           title = "West",
           xlab = "", ylab = "")
 
-plot_cor_tmax_NW <- c_prep4 %>%
+plot_cor_tmin_NW <- c_prep4 %>%
   filter(reg_names%in%c("NW"))%>%
-  ggscatter(x = "PM2.5", y = "HDD", 
+  ggscatter(x = "PM2.5", y = "TMIN", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
           title = "Northwest",
           xlab = "", ylab = "")
 
-plot_cor_tmax_NE <- c_prep4 %>%
+plot_cor_tmin_NE <- c_prep4 %>%
   filter(reg_names%in%c("NE"))%>%
-  ggscatter(x = "PM2.5", y = "HDD", 
+  ggscatter(x = "PM2.5", y = "TMIN", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
           title = "Northeast",
           xlab = "", ylab = "")
 
-plot_cor_pcp_NR <- c_prep4 %>%
+plot_cor_tmin_NR <- c_prep4 %>%
   filter(reg_names%in%c("NR"))%>%
-  ggscatter(x = "PM2.5", y = "HDD", 
+  ggscatter(x = "PM2.5", y = "TMIN", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
           title = "Northern Rockies",
           xlab = "", ylab = "")
 
-plot_cor_tmax_UM <- c_prep4 %>%
+plot_cor_tmin_UM <- c_prep4 %>%
   filter(reg_names%in%c("UM"))%>%
-  ggscatter(x = "PM2.5", y = "HDD", 
+  ggscatter(x = "PM2.5", y = "TMIN", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
           title = "Upper Midwest",
           xlab = "", ylab = "")
 
-plot_cor_hdd_S <- c_prep4 %>%
+plot_cor_tmin_S <- c_prep4 %>%
   filter(reg_names%in%c("S"))%>%
-  ggscatter(x = "PM2.5", y = "HDD", 
+  ggscatter(x = "PM2.5", y = "TMIN", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
           title = "South",
           xlab = "", ylab = "")
 
-plot_cor_tmax_SE <- c_prep4 %>%
+plot_cor_tmin_SE <- c_prep4 %>%
   filter(reg_names%in%c("SE"))%>%
-  ggscatter(x = "PM2.5", y = "PCP", 
+  ggscatter(x = "PM2.5", y = "TMIN", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
           title = "Southeast",
           xlab = "", ylab = "")
 
-plot_cor_tmax_SW <- c_prep4 %>%
+plot_cor_tmin_SW <- c_prep4 %>%
   filter(reg_names%in%c("SW"))%>%
-  ggscatter(x = "PM2.5", y = "HDD", 
+  ggscatter(x = "PM2.5", y = "TMIN", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
           title = "Southwest",
           xlab = "", ylab = "")
 
-plot_cor_tmax_OV <- c_prep4 %>%
+plot_cor_tmin_OV <- c_prep4 %>%
   filter(reg_names%in%c("OV"))%>%
-  ggscatter(x = "PM2.5", y = "HDD", 
+  ggscatter(x = "PM2.5", y = "TMIN", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
           title = "Ohio Valley",
           xlab = "", ylab = "")
 
+#Western regions have too few N so plotting together
+plot_cor_tmin_WEST <- c_prep4 %>%
+  filter(reg_names%in%c("W","NW","SW"))%>%
+  ggscatter(x = "PM2.5", y = "TMIN", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Northwest-West-Southwest",
+          xlab = "", ylab = "")
+
 #plot
-grid.arrange(plot_cor_tmax_NW, plot_cor_tmax_W, plot_cor_tmax_NR, plot_cor_tmax_SW, plot_cor_tmax_UM, plot_cor_tmax_S, plot_cor_tmax_OV, plot_cor_tmax_SE, plot_cor_tmax_NE,
+grid.arrange(plot_cor_tmin_WEST, plot_cor_tmin_NR, plot_cor_tmin_UM, plot_cor_tmin_S, plot_cor_tmin_OV, plot_cor_tmin_SE, plot_cor_tmin_NE,
              ncol = 3, nrow=3,
-             top = textGrob("Correlation: PM 2.5 Level and Maximum Temp by County",gp=gpar(fontsize=18,font=3)),
-             left = textGrob("Maximum Temp", rot = 90,gp=gpar(fontsize=15,font=3)),
+             top = textGrob("Correlation: PM 2.5 Level and Minimum Temp by County",gp=gpar(fontsize=18,font=3)),
+             left = textGrob("Minimum Temp", rot = 90,gp=gpar(fontsize=15,font=3)),
              bottom = textGrob("PM 2.5 Concentration",gp=gpar(fontsize=15,font=3))
              )
 ```
+
+Precipitation levels appear to have a significant and fairly strong positive relationship with PM 2.5 concentration in the South (R=0.69) and Northern Rockies (R=0.57). WAS THIS ANTICIPATED?
 
 ```{r}
 #| fig-width: 12
@@ -1088,8 +940,17 @@ plot_cor_pcp_OV <- c_prep4 %>%
           titale = "Ohio Valley",
           xlab = "", ylab = "")
 
+#Western regions have too few N so plotting together
+plot_cor_pcp_WEST <- c_prep4 %>%
+  filter(reg_names%in%c("W","NW","SW"))%>%
+  ggscatter(x = "PM2.5", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Northwest-West-Southwest",
+          xlab = "", ylab = "")
+
 #plot
-grid.arrange(plot_cor_pcp_NW, plot_cor_pcp_W, plot_cor_pcp_NR, plot_cor_pcp_SW, plot_cor_pcp_UM, plot_cor_pcp_S, plot_cor_pcp_OV, plot_cor_pcp_SE, plot_cor_pcp_NE,
+grid.arrange(plot_cor_pcp_WEST, plot_cor_pcp_NR, plot_cor_pcp_UM, plot_cor_pcp_S, plot_cor_pcp_OV, plot_cor_pcp_SE, plot_cor_pcp_NE,
              ncol = 3, nrow=3,
              top = textGrob("Correlation: PM 2.5 Level and Precipitation",gp=gpar(fontsize=18,font=3)),
              left = textGrob("Precipitation",rot = 90,gp=gpar(fontsize=15,font=3)),
@@ -1136,100 +997,484 @@ prep1%>%
 ```
 
 ```{r}
+# #| fig-width: 12
+# #| fig-height: 8
+# #| fig-cap: Figure 4; UPDATE CAPTION
+# plot_cor_cdd_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "CDD", 
+#           add = "reg.line", conf.int = TRUE, 
+#           cor.coef = TRUE, cor.method = "pearson",
+#           title = "Cooling Degree Days",
+#           xlab = "", ylab = "")
+# 
+# plot_cor_hdd_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "HDD", 
+#           add = "reg.line", conf.int = TRUE, 
+#           cor.coef = TRUE, cor.method = "pearson",
+#           title = "Heating Degree Days",
+#           xlab = "", ylab = "")
+# 
+# plot_cor_pcp_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "PCP", 
+#           add = "reg.line", conf.int = TRUE, 
+#           cor.coef = TRUE, cor.method = "pearson",
+#           title = "Precipitation",
+#           xlab = "", ylab = "")
+# 
+# plot_cor_tavg_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "TAVG", 
+#           add = "reg.line", conf.int = TRUE, 
+#           cor.coef = TRUE, cor.method = "pearson",
+#           title = "Annual Temperature",
+#           xlab = "", ylab = "")
+# 
+# plot_cor_tmax_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "TMAX", 
+#           add = "reg.line", conf.int = TRUE, 
+#           cor.coef = TRUE, cor.method = "pearson",
+#           title = "Maximum Temp",
+#           xlab = "", ylab = "")
+# 
+# plot_cor_tmin_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "TMIN", 
+#           add = "reg.line", conf.int = TRUE, 
+#           cor.coef = TRUE, cor.method = "pearson",
+#           title = "Minumum Temp",
+#           xlab = "", ylab = "")
+# 
+# #plot
+# grid.arrange(plot_cor_tavg_mor, plot_cor_tmin_mor, plot_cor_tmax_mor, plot_cor_cdd_mor, plot_cor_hdd_mor, plot_cor_pcp_mor, 
+#              ncol = 3, nrow=2,
+#              top = textGrob("Correlation: Age-Adjusted Mortality Rates and Climate Variables by County",gp=gpar(fontsize=18,font=3)),
+#              left = textGrob("Climate Variable", rot = 90,gp=gpar(fontsize=15,font=3)),
+#              bottom = textGrob("Age Adjusted Mortality Rate",gp=gpar(fontsize=15,font=3))
+#              )
+```
+
+```{r}
+# #| fig-width: 12
+# #| fig-height: 8
+# #| fig-cap: Figure 4; UPDATE CAPTION
+# plot_cor_cdd_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "CDD", 
+#           add = "reg.line", conf.int = TRUE, 
+#           cor.coef = TRUE, cor.method = "pearson",
+#           title = "Cooling Degree Days",
+#           xlab = "", ylab = "")
+# 
+# plot_cor_hdd_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "HDD", 
+#           add = "reg.line", conf.int = TRUE, 
+#           cor.coef = TRUE, cor.method = "pearson",
+#           title = "Heating Degree Days",
+#           xlab = "", ylab = "")
+# 
+# plot_cor_pcp_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "PCP", 
+#           add = "reg.line", conf.int = TRUE, 
+#           cor.coef = TRUE, cor.method = "pearson",
+#           title = "Precipitation",
+#           xlab = "", ylab = "")
+# 
+# plot_cor_tavg_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "TAVG", 
+#           add = "reg.line", conf.int = TRUE, 
+#           cor.coef = TRUE, cor.method = "pearson",
+#           title = "Annual Temperature",
+#           xlab = "", ylab = "")
+# 
+# plot_cor_tmax_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "TMAX", 
+#           add = "reg.line", conf.int = TRUE, 
+#           cor.coef = TRUE, cor.method = "pearson",
+#           title = "Maximum Temp",
+#           xlab = "", ylab = "")
+# 
+# plot_cor_tmin_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "TMIN", 
+#           add = "reg.line", conf.int = TRUE, 
+#           cor.coef = TRUE, cor.method = "pearson",
+#           title = "Minumum Temp",
+#           xlab = "", ylab = "")
+# 
+# #plot
+# grid.arrange(plot_cor_tavg_mor65, plot_cor_tmin_mor65, plot_cor_tmax_mor65, plot_cor_cdd_mor65, plot_cor_hdd_mor65, plot_cor_pcp_mor65, 
+#              ncol = 3, nrow=2,
+#              top = textGrob("Correlation: Age-Adjusted Mortality Rates (65+) and Climate Variables by County",gp=gpar(fontsize=18,font=3)),
+#              left = textGrob("Climate Variable", rot = 90,gp=gpar(fontsize=15,font=3)),
+#              bottom = textGrob("Age Adjusted Mortality Rate, 65 and over",gp=gpar(fontsize=15,font=3))
+#              )
+```
+
+The below figures plot age-adjusted mortality rates (Figure X: All ages and Figure Y: 65 and over population only) against 2015 maximum temperatures by county. There is a significant, positive relationship in the Ohio Valley area, indicating that counties with higher maximum temperatures tended to have higher age-adjusted mortality rates. This positive relationship is lower in the 65 and over population.
+
+```{r}
 #| fig-width: 12
-#| fig-height: 8
-#| fig-cap: Figure 4; UPDATE CAPTION
-plot_cor_cdd_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "CDD", 
+#| fig-height: 12
+#| fig-cap: Figure 9; UPDATE CAPTION
+
+plot_cor_tmax_mor_W <- c_prep4 %>%
+  filter(reg_names%in%c("W"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "TMAX", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
-          title = "Cooling Degree Days",
+          title = "West",
           xlab = "", ylab = "")
 
-plot_cor_hdd_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "HDD", 
+plot_cor_tmax_mor_NW <- c_prep4 %>%
+  filter(reg_names%in%c("NW"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "TMAX", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
-          title = "Heating Degree Days",
+          title = "Northwest",
           xlab = "", ylab = "")
 
-plot_cor_pcp_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "PCP", 
+plot_cor_tmax_mor_NE <- c_prep4 %>%
+  filter(reg_names%in%c("NE"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "TMAX", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
-          title = "Precipitation",
+          title = "Northeast",
           xlab = "", ylab = "")
 
-plot_cor_tavg_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "TAVG", 
+plot_cor_tmax_mor_NR <- c_prep4 %>%
+  filter(reg_names%in%c("NR"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "TMAX", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
-          title = "Annual Temperature",
+          title = "Northern Rockies",
           xlab = "", ylab = "")
 
-plot_cor_tmax_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "TMAX", 
+plot_cor_tmax_mor_UM <- c_prep4 %>%
+  filter(reg_names%in%c("UM"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "TMAX", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
-          title = "Maximum Temp",
+          title = "Upper Midwest",
           xlab = "", ylab = "")
 
-plot_cor_tmin_mor <- ggscatter(c_prep4, x = "AAMR_ICDI_aa", y = "TMIN", 
+plot_cor_tmax_mor_S <- c_prep4 %>%
+  filter(reg_names%in%c("S"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "TMAX", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
-          title = "Minumum Temp",
+          title = "South",
+          xlab = "", ylab = "")
+
+plot_cor_tmax_mor_SE <- c_prep4 %>%
+  filter(reg_names%in%c("SE"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "TMAX", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Southeast",
+          xlab = "", ylab = "")
+
+plot_cor_tmax_mor_SW <- c_prep4 %>%
+  filter(reg_names%in%c("SW"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "TMAX", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Southwest",
+          xlab = "", ylab = "")
+
+plot_cor_tmax_mor_OV <- c_prep4 %>%
+  filter(reg_names%in%c("OV"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "TMAX", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Ohio Valley",
+          xlab = "", ylab = "")
+
+#Western regions have too few N so plotting together
+plot_cor_tmax_mor_WEST <- c_prep4 %>%
+  filter(reg_names%in%c("W","NW","SW"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "TMAX", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Northwest-West-Southwest",
           xlab = "", ylab = "")
 
 #plot
-grid.arrange(plot_cor_tavg_mor, plot_cor_tmin_mor, plot_cor_tmax_mor, plot_cor_cdd_mor, plot_cor_hdd_mor, plot_cor_pcp_mor, 
-             ncol = 3, nrow=2,
-             top = textGrob("Correlation: Age-Adjusted Mortality Rates and Climate Variables by County",gp=gpar(fontsize=18,font=3)),
-             left = textGrob("Climate Variable", rot = 90,gp=gpar(fontsize=15,font=3)),
-             bottom = textGrob("Age Adjusted Mortality Rate",gp=gpar(fontsize=15,font=3))
+grid.arrange(plot_cor_tmax_mor_WEST, plot_cor_tmax_mor_NR, plot_cor_tmax_mor_UM, plot_cor_tmax_mor_S, plot_cor_tmax_mor_OV, plot_cor_tmax_mor_SE, plot_cor_tmax_mor_NE,
+             ncol = 3, nrow=3,
+             top = textGrob("Correlation: Age-Adjusted Mortality Rates and Max Temp by County",gp=gpar(fontsize=18,font=3)),
+             left = textGrob("Maximum Temp", rot = 90,gp=gpar(fontsize=15,font=3)),
+             bottom = textGrob("Age-Adjusted Mortality",gp=gpar(fontsize=15,font=3))
              )
 ```
 
 ```{r}
 #| fig-width: 12
-#| fig-height: 8
-#| fig-cap: Figure 4; UPDATE CAPTION
-plot_cor_cdd_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "CDD", 
+#| fig-height: 12
+#| fig-cap: Figure 9; UPDATE CAPTION
+
+plot_cor_tmax_mor65_W <- c_prep4 %>%
+  filter(reg_names%in%c("W"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "TMAX", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
-          title = "Cooling Degree Days",
+          title = "West",
           xlab = "", ylab = "")
 
-plot_cor_hdd_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "HDD", 
+plot_cor_tmax_mor65_NW <- c_prep4 %>%
+  filter(reg_names%in%c("NW"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "TMAX", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
-          title = "Heating Degree Days",
+          title = "Northwest",
           xlab = "", ylab = "")
 
-plot_cor_pcp_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "PCP", 
+plot_cor_tmax_mor65_NE <- c_prep4 %>%
+  filter(reg_names%in%c("NE"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "TMAX", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
-          title = "Precipitation",
+          title = "Northeast",
           xlab = "", ylab = "")
 
-plot_cor_tavg_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "TAVG", 
+plot_cor_tmax_mor65_NR <- c_prep4 %>%
+  filter(reg_names%in%c("NR"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "TMAX", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
-          title = "Annual Temperature",
+          title = "Northern Rockies",
           xlab = "", ylab = "")
 
-plot_cor_tmax_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "TMAX", 
+plot_cor_tmax_mor65_UM <- c_prep4 %>%
+  filter(reg_names%in%c("UM"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "TMAX", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
-          title = "Maximum Temp",
+          title = "Upper Midwest",
           xlab = "", ylab = "")
 
-plot_cor_tmin_mor65 <- ggscatter(c_prep4, x = "AAMR_ICDI65_aa", y = "TMIN", 
+plot_cor_tmax_mor65_S <- c_prep4 %>%
+  filter(reg_names%in%c("S"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "TMAX", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
-          title = "Minumum Temp",
+          title = "South",
+          xlab = "", ylab = "")
+
+plot_cor_tmax_mor65_SE <- c_prep4 %>%
+  filter(reg_names%in%c("SE"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "TMAX", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Southeast",
+          xlab = "", ylab = "")
+
+plot_cor_tmax_mor65_SW <- c_prep4 %>%
+  filter(reg_names%in%c("SW"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "TMAX", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Southwest",
+          xlab = "", ylab = "")
+
+plot_cor_tmax_mor65_OV <- c_prep4 %>%
+  filter(reg_names%in%c("OV"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "TMAX", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Ohio Valley",
+          xlab = "", ylab = "")
+
+#Western regions have too few N so plotting together
+plot_cor_tmax_mor65_WEST <- c_prep4 %>%
+  filter(reg_names%in%c("W","NW","SW"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "TMAX", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Northwest-West-Southwest",
           xlab = "", ylab = "")
 
 #plot
-grid.arrange(plot_cor_tavg_mor65, plot_cor_tmin_mor65, plot_cor_tmax_mor65, plot_cor_cdd_mor65, plot_cor_hdd_mor65, plot_cor_pcp_mor65, 
-             ncol = 3, nrow=2,
-             top = textGrob("Correlation: Age-Adjusted Mortality Rates and Climate Variables by County",gp=gpar(fontsize=18,font=3)),
-             left = textGrob("Climate Variable", rot = 90,gp=gpar(fontsize=15,font=3)),
-             bottom = textGrob("Age Adjusted Mortality Rate, 65 and over",gp=gpar(fontsize=15,font=3))
+grid.arrange(plot_cor_tmax_mor65_WEST, plot_cor_tmax_mor65_NR, plot_cor_tmax_mor65_UM, plot_cor_tmax_mor65_S, plot_cor_tmax_mor65_OV, plot_cor_tmax_mor65_SE, plot_cor_tmax_mor65_NE,
+             ncol = 3, nrow=3,
+             top = textGrob("Correlation: Age-Adjusted Mortality Rates (65+) and Max Temp by County",gp=gpar(fontsize=18,font=3)),
+             left = textGrob("Maximum Temp", rot = 90,gp=gpar(fontsize=15,font=3)),
+             bottom = textGrob("Age-Adjusted Mortality (65+)",gp=gpar(fontsize=15,font=3))
+             )
+```
+
+The next two figures plot age-adjusted mortality rates (Figure X: All ages and Figure Y: 65 and over population only) against 2015 precipitaion levels by county. There is a significant, positive relationship in both the South and Ohio Valley areas, indicating that counties with higher precipitation levels tended to have higher age-adjusted mortality rates. As with the maximum temperature findings, there positive relationships are lower in the 65 and over population.
+
+```{r}
+#| fig-width: 12
+#| fig-height: 12
+#| fig-cap: Figure 9; UPDATE CAPTION
+
+plot_cor_pcp_mor_W <- c_prep4 %>%
+  filter(reg_names%in%c("W"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "West",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor_NW <- c_prep4 %>%
+  filter(reg_names%in%c("NW"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Northwest",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor_NE <- c_prep4 %>%
+  filter(reg_names%in%c("NE"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Northeast",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor_NR <- c_prep4 %>%
+  filter(reg_names%in%c("NR"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Northern Rockies",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor_UM <- c_prep4 %>%
+  filter(reg_names%in%c("UM"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Upper Midwest",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor_S <- c_prep4 %>%
+  filter(reg_names%in%c("S"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "South",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor_SE <- c_prep4 %>%
+  filter(reg_names%in%c("SE"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Southeast",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor_SW <- c_prep4 %>%
+  filter(reg_names%in%c("SW"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "TMAX", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Southwest",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor_OV <- c_prep4 %>%
+  filter(reg_names%in%c("OV"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Ohio Valley",
+          xlab = "", ylab = "")
+
+#Western regions have too few N so plotting together
+plot_cor_pcp_mor_WEST <- c_prep4 %>%
+  filter(reg_names%in%c("W","NW","SW"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Northwest-West-Southwest",
+          xlab = "", ylab = "")
+
+#plot
+grid.arrange(plot_cor_pcp_mor_WEST, plot_cor_pcp_mor_NR, plot_cor_pcp_mor_UM, plot_cor_pcp_mor_S, plot_cor_pcp_mor_OV, plot_cor_pcp_mor_SE, plot_cor_pcp_mor_NE,
+             ncol = 3, nrow=3,
+             top = textGrob("Correlation: Age-Adjusted Mortality Rates and Precipitation by County",gp=gpar(fontsize=18,font=3)),
+             left = textGrob("Precipitation", rot = 90,gp=gpar(fontsize=15,font=3)),
+             bottom = textGrob("Age-Adjusted Mortality",gp=gpar(fontsize=15,font=3))
+             )
+```
+
+```{r}
+#| fig-width: 12
+#| fig-height: 12
+#| fig-cap: Figure 9; UPDATE CAPTION
+
+plot_cor_pcp_mor65_W <- c_prep4 %>%
+  filter(reg_names%in%c("W"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "West",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor65_NW <- c_prep4 %>%
+  filter(reg_names%in%c("NW"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Northwest",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor65_NE <- c_prep4 %>%
+  filter(reg_names%in%c("NE"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Northeast",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor65_NR <- c_prep4 %>%
+  filter(reg_names%in%c("NR"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Northern Rockies",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor65_UM <- c_prep4 %>%
+  filter(reg_names%in%c("UM"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Upper Midwest",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor65_S <- c_prep4 %>%
+  filter(reg_names%in%c("S"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "South",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor65_SE <- c_prep4 %>%
+  filter(reg_names%in%c("SE"))%>%
+  ggscatter(x = "AAMR_ICDI_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Southeast",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor65_SW <- c_prep4 %>%
+  filter(reg_names%in%c("SW"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "TMAX", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Southwest",
+          xlab = "", ylab = "")
+
+plot_cor_pcp_mor65_OV <- c_prep4 %>%
+  filter(reg_names%in%c("OV"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Ohio Valley",
+          xlab = "", ylab = "")
+
+#Western regions have too few N so plotting together
+plot_cor_pcp_mor65_WEST <- c_prep4 %>%
+  filter(reg_names%in%c("W","NW","SW"))%>%
+  ggscatter(x = "AAMR_ICDI65_aa", y = "PCP", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          title = "Northwest-West-Southwest",
+          xlab = "", ylab = "")
+
+#plot
+grid.arrange(plot_cor_pcp_mor65_WEST, plot_cor_pcp_mor65_NR, plot_cor_pcp_mor65_UM, plot_cor_pcp_mor65_S, plot_cor_pcp_mor65_OV, plot_cor_pcp_mor65_SE, plot_cor_pcp_mor65_NE,
+             ncol = 3, nrow=3,
+             top = textGrob("Correlation: Age-Adjusted Mortality Rates 65+ and Precipitation by County",gp=gpar(fontsize=18,font=3)),
+             left = textGrob("Precipitation", rot = 90,gp=gpar(fontsize=15,font=3)),
+             bottom = textGrob("Age-Adjusted Mortality 65+",gp=gpar(fontsize=15,font=3))
              )
 ```
 
@@ -1238,6 +1483,10 @@ To further characterize county populations, demographic and behavioral data are 
 Land cover data used in this model are originally sourced from the National Land Cover Database's (NLCD). The International Public Use Microdata Series (IPUMS) released county-level summaries of NLCD land cover data, which are displayed in the ensuing plots. Per IPUMS' annotations on methodology, NLCD data were layered with census geographic polygons to calculate the area covered by each land class [@environm]. Land cover classifications are determined by NLCD using a modified Anderson Land Cover Classification System [@national]. A description of NLCD's land cover classifications are denoted in the data table below. Data used in this model reflect 2011 land cover data summarized by county geographic boundaries in the U.S. Census Bureau's 2015 data set.
 
 ![NLCD Land Cover Types](land%20cover%20types.png){width="666"}
+
+Land cover data are summarized into the following major classes: wetlands (woody and emergent herbaceous), planted (pasture, cultivated crops), herbaceous (grassland / herbaceous), shrubland (shrub/scrub), forest (deciduous, evergreen, and mixed forest), barren (barren land - rocks and clay), developed (low, mid, and high intensity development), and water (open water, perennial ice/snow). National county-level distribution of proportional land cover are displayed in FIGURE WHAT below. The planted (pasture, cultivated crops) and forest land cover types have even and long distributions, indicating that proportions of land dedicated to these land cover types vary widely by county and are not normally distributed. Other land cover types are closer to normal distributions. Notably, the first quartile of wetlands, herbaceous, shrubland, barren, and water are around 0%, indicating that around one quarter of counties in the contiguous U.S. are not at all represented by at least one of those land cover types.
+
+LONG TAILS
 
 ```{r}
 #| fig-cap: Figure 11; UPDATE CAPTION
@@ -1281,19 +1530,19 @@ variable<-paste("PROP",legend$ID,sep="")
 legend_box<-cbind(legend,variable)
 
 #reshape for box plots
-US_box1<-subset(c_prep5,select=c(1:2,48,65:73)) #entropy all major categories
-US_box2<-subset(c_prep5,select=c(1:2,48,51:54,73)) #entropy focused on developed types
+US_box1<-subset(c_prep5,select=c(1:2,48,65:72)) #entropy all major categories
+US_box2<-subset(c_prep5,select=c(1:2,48,51:54,65,67:72)) #entropy focused on developed types
 
 #careful of reshape2 warning
 US_box1<-reshape2::melt(US_box1,id.vars=c('cofips','NAME','reg_names'),measure.vars=c('water','developed','barren','forest','shrubland','herbaceous','planted','wetlands'))
 
 #careful of reshape2 warning
-US_box2<-reshape2::melt(US_box2,id.vars=c('cofips','NAME','reg_names'),measure.vars=c('dev_open','dev_low','dev_med','dev_high','all_else'))
+US_box2<-reshape2::melt(US_box2,id.vars=c('cofips','NAME','reg_names'),measure.vars=c('dev_open','dev_low','dev_med','dev_high','barren','forest','shrubland','herbaceous','planted','wetlands','water'))
 
 ############REPEAT FOR FIRST REGION################
 
 #reshape for box plots
-W_box1<-subset(c_prep5,select=c(1:2,48,65:73))%>%
+W_box1<-subset(c_prep5,select=c(1:2,48,65:72))%>%
   filter(reg_names%in%c("W"))
 
 #careful of reshape2 warning
@@ -1301,7 +1550,7 @@ W_box2<-reshape2::melt(W_box1,id.vars=c('cofips','NAME','reg_names'),measure.var
 
 ############REPEAT FOR SECOND REGION################
 #reshape for box plots
-SE_box1<-subset(c_prep5,select=c(1:2,48,65:73))%>%
+SE_box1<-subset(c_prep5,select=c(1:2,48,65:72))%>%
   filter(reg_names%in%c("SE"))
 
 #careful of reshape2 warning
@@ -1309,7 +1558,7 @@ SE_box2<-reshape2::melt(SE_box1,id.vars=c('cofips','NAME','reg_names'),measure.v
 
 ############REPEAT FOR THIRD REGION################
 #reshape for box plots
-OV_box1<-subset(c_prep5,select=c(1:2,48,65:73))%>%
+OV_box1<-subset(c_prep5,select=c(1:2,48,65:72))%>%
   filter(reg_names%in%c("OV"))
 
 #careful of reshape2 warning
@@ -1317,7 +1566,7 @@ OV_box2<-reshape2::melt(OV_box1,id.vars=c('cofips','NAME','reg_names'),measure.v
 
 ############REPEAT FOR FOURTH REGION################
 #reshape for box plots
-NW_box1<-subset(c_prep5,select=c(1:2,48,65:73))%>%
+NW_box1<-subset(c_prep5,select=c(1:2,48,65:72))%>%
   filter(reg_names%in%c("NW"))
 
 #careful of reshape2 warning
@@ -1325,7 +1574,7 @@ NW_box2<-reshape2::melt(NW_box1,id.vars=c('cofips','NAME','reg_names'),measure.v
 
 ############REPEAT FOR FIFTH REGION################
 #reshape for box plots
-NR_box1<-subset(c_prep5,select=c(1:2,48,65:73))%>%
+NR_box1<-subset(c_prep5,select=c(1:2,48,65:72))%>%
   filter(reg_names%in%c("NR"))
 
 #careful of reshape2 warning
@@ -1333,7 +1582,7 @@ NR_box2<-reshape2::melt(NR_box1,id.vars=c('cofips','NAME','reg_names'),measure.v
 
 ############REPEAT FOR SIXTH REGION################
 #reshape for box plots
-UM_box1<-subset(c_prep5,select=c(1:2,48,65:73))%>%
+UM_box1<-subset(c_prep5,select=c(1:2,48,65:72))%>%
   filter(reg_names%in%c("UM"))
 
 #careful of reshape2 warning
@@ -1341,7 +1590,7 @@ UM_box2<-reshape2::melt(UM_box1,id.vars=c('cofips','NAME','reg_names'),measure.v
 
 ############REPEAT FOR SEVENTH REGION################
 #reshape for box plots
-NE_box1<-subset(c_prep5,select=c(1:2,48,65:73))%>%
+NE_box1<-subset(c_prep5,select=c(1:2,48,65:72))%>%
   filter(reg_names%in%c("NE"))
 
 #careful of reshape2 warning
@@ -1349,7 +1598,7 @@ NE_box2<-reshape2::melt(NE_box1,id.vars=c('cofips','NAME','reg_names'),measure.v
 
 ############REPEAT FOR EIGHTH REGION################
 #reshape for box plots
-SW_box1<-subset(c_prep5,select=c(1:2,48,65:73))%>%
+SW_box1<-subset(c_prep5,select=c(1:2,48,65:72))%>%
   filter(reg_names%in%c("SW"))
 
 #careful of reshape2 warning
@@ -1357,7 +1606,7 @@ SW_box2<-reshape2::melt(SW_box1,id.vars=c('cofips','NAME','reg_names'),measure.v
 
 ############REPEAT FOR NINTH REGION################
 #reshape for box plots
-S_box1<-subset(c_prep5,select=c(1:2,48,65:73))%>%
+S_box1<-subset(c_prep5,select=c(1:2,48,65:72))%>%
   filter(reg_names%in%c("S"))
 
 #careful of reshape2 warning
@@ -1493,7 +1742,7 @@ entropy$entropy <- (entropy$entropy_prep *-1) / log(8)
 entropy<-entropy[,-c(2)]
 
 colnames(entropy_dev) <- c("cofips","entropy_dev_prep")
-entropy_dev$entropy_dev <- as.numeric((entropy_dev$entropy_dev_prep *-1) / log(5))
+entropy_dev$entropy_dev <- as.numeric((entropy_dev$entropy_dev_prep *-1) / log(11))
 entropy_dev<-entropy_dev[,-c(2)]
 
 #merge entropy index to cprep
@@ -1518,7 +1767,7 @@ c_prep6%>%
   scale_fill_viridis_d(option = "cividis",direction = -1, na.value="white")+
   scale_y_continuous(label=scales::comma)+
   geom_sf(data=sts, color="black")+
-  ggtitle("Land Use Entropy Index by County- Developed Focus", subtitle = "NLCD 2011")
+  ggtitle("Land Use Entropy Index by County - All Dev Types", subtitle = "NLCD 2011")
 
 ```
 
@@ -1528,11 +1777,13 @@ The dependent variable that is being used as a proxy for health is age-adjusted 
 
 A linear regression model is then evaluated for spatial autocorrelation. The regression model depends on independence and heteroskedasticity of residuals. If spatial autocorrelation is present, then both rules are broken. Spatial autocorrelation is tested using the Global Moran's I test, followed by mapping the Local Moran's I. Spatial clustering is revealed by the Local Indicator of Spatial Association (LISA) map. The Lagrange Multiplier test is consulted to determine if spatial error or spatial lag is driving spatial autocorrelation in the model. Based on the Lagrange Multiplier results, the spatial \[lag/error\] model is used to try to produce a better model.
 
+## Results
+
 ```{r}
 #prep data 
 health_c <- read_excel('data files/2016 county health v3.xlsx') 
 c_prep7<-left_join(c_prep6,health_c, by="cofips") 
-c_prep7<-subset(c_prep7,select=-c(74:75)) 
+c_prep7<-subset(c_prep7,select=-c(75:77)) 
 
 #drop unnecessary variables
 c_df <- subset(c_prep7, select = -c(13:18,25:27,29:31,33:35,37:39,41:43,45:47,49:50,55:64))
@@ -1558,12 +1809,12 @@ c_df1 <- subset(c_df1,select=-c(4:11))
 # prep data for OLS model
 #removed rural... too many NAs... is there another source?
 #removing items not needed in model A & filter complete cases
-c_df2_a <-subset(c_df1,select=-c(2:5,7,9:10,13:28,33,37:39))%>%
-    filter(complete.cases(AAMR_all_ICDI_use,pct_white,pct_black,pct_hispanic,pct_bach,pct_pov,PM2.5,pct_smokers,pct_obese,pct_uninsured,entropy,HDD,PCP))
+c_df2_a <-subset(c_df1,select=-c(2:5,7,9:11,13,15:29,34,38:40))%>%
+    filter(complete.cases(AAMR_all_ICDI_use,pct_white,pct_black,pct_hispanic,pct_bach,pct_pov,PM2.5,pct_smokers,pct_obese,pct_uninsured,entropy,TMAX,PCP))
 
  #removing items not needed in model B & filter complete cases                              
-c_df2_b <-subset(c_df1,select=-c(2:6,9:10,13:28,33,37:39))%>%
-    filter(complete.cases(AAMR_all_ICDI65_use,pct_white,pct_black,pct_hispanic,pct_bach,pct_pov,PM2.5,pct_smokers,pct_obese,pct_uninsured,entropy,HDD,PCP))
+c_df2_b <-subset(c_df1,select=-c(2:6,9:11,13,15:29,34,38:40))%>%
+    filter(complete.cases(AAMR_all_ICDI65_use,pct_white,pct_black,pct_hispanic,pct_bach,pct_pov,PM2.5,pct_smokers,pct_obese,pct_uninsured,entropy,TMAX,PCP))
 
 #remove geometry
 c_df3_a <- c_df2_a%>%
@@ -1589,10 +1840,10 @@ c_df6_a[]<-lapply(c_df6_a,as.numeric)
 c_df6_b[]<-lapply(c_df6_b,as.numeric)
 
 #OLS model A
-fit_c_df_a<- lm(AAMR_all_ICDI_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy + HDD + PCP, data = c_df6_a)
+fit_c_df_a<- lm(AAMR_all_ICDI_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy + TMAX + PCP, data = c_df6_a)
 
 # #OLS model B
-fit_c_df_b<- lm(AAMR_all_ICDI65_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy + HDD + PCP, data = c_df6_b)
+fit_c_df_b<- lm(AAMR_all_ICDI65_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy + TMAX + PCP, data = c_df6_b)
 
 summary(fit_c_df_a)
 summary(fit_c_df_b)
@@ -1679,7 +1930,7 @@ labels <- c("High-High", "Low-Low", "High-Low", "Low-High", "Not Clustered")
 colors <- c("red", "blue", "lightpink", "skyblue2", "white")
 
 plot(c_df2_a['rstudent'], col = colors[np_r], main="Moran LISA Cluster Map - Model Residuals (KNN = 6)")
-legend("topright", legend = labels, fill = colors, bty = "n")
+legend("bottomright", legend = labels, fill = colors, bty = "n")
 
 #Mapping Model Residuals - Model B
 c_df2_b$rstudent <- rstudent(fit_c_df_b)
@@ -1719,11 +1970,10 @@ labels <- c("High-High", "Low-Low", "High-Low", "Low-High", "Not Clustered")
 colors <- c("red", "blue", "lightpink", "skyblue2", "white")
 
 plot(c_df2_b['rstudent'], col = colors[np_r], main="Moran LISA Cluster Map 65+ - Model Residuals (KNN = 6)")
-legend("topright", legend = labels, fill = colors, bty = "n")
+legend("bottomright", legend = labels, fill = colors, bty = "n")
 
 
 ```
-
 ```{r}
 fit_df2_a_tests <- lm.LMtests(fit_c_df_a, listw = df_1a_wt6,test = c("LMerr", "LMlag", "RLMerr", "RLMlag") )
 fit_df2_b_tests <- lm.LMtests(fit_c_df_b, listw = df_1b_wt6,test = c("LMerr", "LMlag", "RLMerr", "RLMlag") )
@@ -1732,15 +1982,14 @@ fit_df2_a_tests
 fit_df2_b_tests
 
 #higher value for Err than lag in both instances. Go with error model
-fit_df2_a_err <- errorsarlm(AAMR_all_ICDI_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy + HDD + PCP, data = c_df6_a, listw = df_1a_wt6)
+fit_df2_a_err <- errorsarlm(AAMR_all_ICDI_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy + TMAX + PCP, data = c_df6_a, listw = df_1a_wt6)
 
-fit_df2_b_err <- errorsarlm(AAMR_all_ICDI65_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy + HDD + PCP, data = c_df6_b, listw = df_1b_wt6)
+fit_df2_b_err <- errorsarlm(AAMR_all_ICDI65_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy + TMAX + PCP, data = c_df6_b, listw = df_1b_wt6)
 
 summary(fit_df2_a_err)
 summary(fit_df2_b_err)
 
 #evaluate compared to OLS model. Are Residual mean squared and AIC smaller? Smaller the better for both
-#adding note so i can push to git
 
 ```
 
