@@ -144,6 +144,7 @@ div.csl-indent {
   <ul>
   <li><a href="#relationship-between-health-and-place" id="toc-relationship-between-health-and-place" class="nav-link active" data-scroll-target="#relationship-between-health-and-place"><span class="toc-section-number">1.1</span>  Relationship Between Health and Place</a></li>
   <li><a href="#data-and-methods" id="toc-data-and-methods" class="nav-link" data-scroll-target="#data-and-methods"><span class="toc-section-number">1.2</span>  Data and Methods</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="toc-section-number">1.3</span>  Results</a></li>
   </ul>
 </nav>
     </div>
@@ -183,7 +184,9 @@ div.csl-indent {
 </section>
 <section id="data-and-methods" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="data-and-methods"><span class="header-section-number">1.2</span> Data and Methods</h2>
-<p>Data fall into four major categories: health, demographic, air pollution, and land use. However, since this is a spatial analysis, the common thread in all data sources is the spatial linkage. Spatial evaluation of air pollution’s impact on health is considered on a regional level. Following the approach that Simon and colleagues take to evaluate ozone trends in the U.S., this analysis also uses NOAA climate regions in the analysis of air pollution <span class="citation" data-cites="simon2015">(<a href="references.html#ref-simon2015" role="doc-biblioref">2015</a>)</span>. Evaluation of data on a regional scale lowers the model’s sensitivity to factors such as wind, climate, and pollutants’ chemical reactions with other molecules in the air that can cause the concentration of air pollution to change <span class="citation" data-cites="simon2015">(<a href="references.html#ref-simon2015" role="doc-biblioref">Simon et al. 2015</a>, pp 186, pp.&nbsp;188)</span>. To this end, four regions were selected for this research, which represent different climate areas and a wide variety of land cover types.</p>
+<p>Data fall into four major categories: health, demographic, air pollution, and land use. However, since this is a spatial analysis, the common thread in all data sources is the spatial linkage. Spatial evaluation of air pollution’s impact on health is considered on a regional level. Following the approach that Simon and colleagues take to evaluate ozone trends in the U.S., this analysis also uses NOAA climate regions to summarize the analysis air pollution <span class="citation" data-cites="simon2015">(<a href="references.html#ref-simon2015" role="doc-biblioref">2015</a>)</span>. Evaluation of data on a regional scale is conceptually supported due to the NOAA climate region categorization of areas with similar wind, climate, and emissions sources, which all can influence the concentration of air pollution <span class="citation" data-cites="simon2015">(<a href="references.html#ref-simon2015" role="doc-biblioref">Simon et al. 2015</a>, pp 186, pp.&nbsp;188)</span>. Additionally, in an acknowledgement of the environmental factors that influence both air pollution and health impacts, the model includes select annual, county-level climate variables.</p>
+<p>This research focuses on particulate matter (PM) 2.5 measures from 2015, as captured by the Environmental Protection Agency (EPA) and further manipulated by the Centers for Disease Control and Prevention (CDC). PM 2.5 are “fine, inhalable particles with diameters that are generally 2.5 micrometers or smaller,” that have been linked to various complications with lung and heart functions <span class="citation" data-cites="usepa2016">(<a href="references.html#ref-usepa2016" role="doc-biblioref">US EPA 2016</a>)</span>. The EPA publishes extensive amounts of air quality data, which are accessible through their Air Data website. Available data include annual summaries by monitor.</p>
+<p>Figure 1 plots the 2015 annual PM 2.5 measures across the contiguous U.S. to provide a geographic reference for monitor locations and start to visually represent the variation in PM 2.5 measurements by region. A visual inspection of Figure 1 reveals how monitors are distributed throughout each region and their individual readings. It is noted that monitors are highly concentrated in certain areas (for example, the New Jersey to Massachusetts area) and few and far between in others (for example, in the Western landlocked states). This observation leads to the acknowledgement of potential spatial bias: monitors are not normally distributed throughout space, therefore spatial bias may be introduced due to the distribution of data across the measurement areas. However, the level of spatial bias difficult to measure due to this model’s use of CDC-modeled data.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -194,24 +197,43 @@ div.csl-indent {
 </div>
 </div>
 </div>
-<p>This research focuses on particulate matter (PM) 2.5 measures from 2015, as captured by the Environmental Protection Agency (EPA) and further manipulated by the Centers for Disease Control and Prevention (CDC). PM 2.5 are “fine, inhalable particles with diameters that are generally 2.5 micrometers or smaller,” that have been linked to various complications with lung and heart functions <span class="citation" data-cites="usepa2016">(<a href="references.html#ref-usepa2016" role="doc-biblioref">US EPA 2016</a>)</span>. The EPA publishes extensive amounts of air quality data, which are accessible through their Air Data website. Available data include annual summaries by monitor.</p>
-<p>Figure 1 plots the 2015 annual PM 2.5 measures on region-dependent scales by NOAA Climate region to provide a geographic reference for monitor locations and start to visually represent the variation in PM 2.5 measurements by region. The entire contiguous U.S. is represented in Figure 1, but it is worth noting that only the Northwest, West, Ohio Valley, and Southeast NOAA Climate Regions were selected for this study. These regions were selected due to their climatic variation, regional air quality variation, and either high presence or decent distribution of air quality monitors. A visual inspection of Figure 1 reveals how monitors are distributed throughout each region and their individual readings. It is noted that though the West region has a relative abundance of monitors in California, monitors are sparse in Nevada. This observation leads to the acknowledgement of potential spatial bias: monitors are not normally distributed throughout space, therefore spatial bias may be introduced due to the distribution of data across the measurement areas. However, the level of spatial bias difficult to measure due to the use of the CDC’s modeled data.</p>
-<div class="cell">
-
-</div>
 <p>The CDC provides measured and modeled PM 2.5 data by county for the U.S., as depicted in Figure 2. They derive their data from daily PM 2.5 measurements produced by the EPA, then further model to infer measurements for areas where there are gaps in the data. Derivations are primarily based on the Downscaler (DS) model, which is “a statistical fusion of monitoring data and Community Multiscale Air Quality (CMAQ) outputs,” [@geograph]. While use of this data is convenient, a future iteration of this research will produce and employ a PM 2.5 inference model, which would be produced specifically for this research. Doing so would control for any unknowns that are introduced due to the limitations of using modeled data that is not easily reproducible.</p>
 <p>One limitation of the air quality data used in this model is the use of annually summarized data. While useful, annual summaries may not be sensitive enough to capture acute changes in air quality, which pose a health risk (CITE?). This relationship may not be captured in the model if poor air quality days are infrequent enough to impact the mean. For simplicity, this research does not take seasonality into consideration and instead uses annual averages, which does not accurately reflect variation in air pollution ranges.</p>
-<p>DESCRIBE FIGURE 2</p>
+<p>TALK ABOUT HOW THIS YEAR COMPARES TO OTHER YEARS</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="intro_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="intro_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="960"></p>
 <p></p><figcaption class="figure-caption">Figure 2; County-level air pollution statistics. Region selection limited by availability of data</figcaption><p></p>
 </figure>
 </div>
 </div>
 </div>
+<p>Climate data are included in this model to account for impacts of environmental factors on PM2.5 levels. Research by Zhang and colleagues comparing daily PM2.5 measurements against various daily climate indicators found a strong positive relationship between high temperatures with increased PM2.5 concentration, with the highest correlation found in rural areas. An overwhleming pattern of overlap between extreme high PM2.5 levels and extreme heat days was found in most weather monitors across the country <span class="citation" data-cites="zhang2017">(<a href="references.html#ref-zhang2017" role="doc-biblioref">Zhang et al. 2017, 75</a>)</span>. They also found that days with extremely low relative humidity were associated with a higher probability of extreme PM 2.5 concentration <span class="citation" data-cites="zhang2017">(<a href="references.html#ref-zhang2017" role="doc-biblioref">Zhang et al. 2017, 77</a>)</span>. This association is especially strong in the northern U.S. and Great Plains regions, which Zhang and colleagues attribute to relative humidity’s impact on particle formation due to power plant emissions and agricultural activities <span class="citation" data-cites="zhang2017">(<a href="references.html#ref-zhang2017" role="doc-biblioref">Zhang et al. 2017, 75</a>)</span>. Though Zhang and colleagues found strong, statistically significant relationships, they also note that complexities exist between PM2.5 concentration and climate factors. Bell and colleagues highlight this point succintly in their analysis of PM2.5 components, noting that “the PM2.5 mixture varies strongly by region and by season, and the degree of spatial and temporaly variability varies by component,” <span class="citation" data-cites="spatial">(<a href="references.html#ref-spatial" role="doc-biblioref"><span>“Spatial and Temporal Variation in PM2.5 Chemical Composition in the United States for Health Effects Studies,”</span> n.d., 993</a>)</span>. At any given time, variations in the mixture of PM2.5 components may magnify or subdue expected reactions with climatic events.</p>
+<p>Climate can also impact health independently of its impact on air pollution. Research on cardiovascular and respiratory hospitalizations in Cyprus, Greece found significant correlations between increased hospitalizations and two climactic categories: “cold, cloudy days with increased levels of precipitation,” and “warm, rainy days with increased levels of water vapor in the atmosphere,” <span class="citation" data-cites="tsangari2016">(<a href="references.html#ref-tsangari2016" role="doc-biblioref">Tsangari et al. 2016, 251</a>)</span>. Their findings suggest depressed health on days when the climate causes discomfort: days when temperatures and humidity are high, as well as on cold days with increased precipitation. WRAP UP SENTENCE TO DRIVE HOME WHY CLIMATE IS AN IMPORTANT FACTOR.</p>
+<p>For ease of interpretation, climate data are summarized by NOAA climate region. Figure 3 is included as a reference to show which states are included in each region.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="intro_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9 x 2
+  reg_names states                                        
+* &lt;chr&gt;     &lt;chr&gt;                                         
+1 NE        PA, VT, MA, NH, DE, CT, NJ, MD, ME, RI, NY, DC
+2 NR        NE, SD, WY, MT, ND                            
+3 NW        WA, OR, ID                                    
+4 OV        KY, TN, IN, IL, OH, MO, WV                    
+5 S         AR, MS, OK, LA, KS, TX                        
+6 SE        GA, SC, AL, NC, VA, FL                        
+7 SW        NM, CO, UT, AZ                                
+8 UM        IA, WI, MI, MN                                
+9 W         NV, CA                                        </code></pre>
+</div>
+</div>
+<p>Figure 4 displays climate variables of interest based on county groupings into NOAA climate regions. The box-and-whisker plots show the distribution of county-level climate in 2015. The top three plots show temperature trends in 2015 across the contiguous U.S. As expected, the areas with high average, maximum, and minimum temperatures are the South (S), Southeast (SE), and West (W) regions. The region with large variations in temperature indicators by county is the Southwest (SW). Though average temperatures for the region are lower than the other regions mentioned, there are a number of outliers whose average, minimum, and maximum temperatures in 2015 are significantly higher than the rest of the group. Climate regions with low minimum temperatures are the Northern Rockies (NR) and Upper Midwest (UM), whose mean minimum temperature is in the low thirties. By contrast, the South has the highest mean minimum temperature among its counties, averaging at fifty degrees.</p>
+<p>The bottom three plots display annual cooling degree days, heating degree days, and precipitation. Degree days are an indicator of the “demand for energy to heat or cool houses and businesses,” indexed against a mean daily temperature of 65 degrees Fahrenheit <span class="citation" data-cites="climate">(<a href="references.html#ref-climate" role="doc-biblioref"><span>“Climate Prediction Center - Monitoring &amp; Data: Weekly &amp; Monthly Degree Day Summaries Explanation,”</span> n.d.</a>)</span>. Degree days are population weighted to better estimate the impact of temperature on human energy consumption <span class="citation" data-cites="climate">(<a href="references.html#ref-climate" role="doc-biblioref"><span>“Climate Prediction Center - Monitoring &amp; Data: Weekly &amp; Monthly Degree Day Summaries Explanation,”</span> n.d.</a>)</span>. The annual cooling and heating degree days are consistent with annual temperature trends. The relatively small interquartile ranges of cooling degree days by region suggest that cooling degree days are generally less varied, though there is a notable increase in high outliers in southern regions when comparing against the average annual temperature plot. The higher prevalence of these outliers implies two potential causes: either there is a small number of counties that have consistently higher temperatures than other counties in their respective regions or that areas with higher temperatures have high population densities (impacting the population weighting component of the degree day calculation). The annual precipitation plot shows that there is little variation in most regions: all but the Northwest (NW), South (S), and West (W) regions have fairly tight ranges. The Northwest shows the regional largest variance within its counties in 2015, encompassing counties on the low end when comparing across the entire contiguous U.S. while also including counties the extreme high end.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -222,6 +244,7 @@ div.csl-indent {
 </div>
 </div>
 </div>
+<p>To determine which of these climate indicators may be significant in the model, the below figures explore the relationship between annual PM 2.5 concentration and the various climate indicators. Figure 5 plots the six climate variables against PM 2.5 concentration for all counties. While there certainly is variation in the data points for the six climate variables, the PM 2.5 concentration nationally is much more uniform, resulting in significant, but low positive correlations for each set of variables.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -232,6 +255,8 @@ div.csl-indent {
 </div>
 </div>
 </div>
+<p>Plotting the data for the wide, national scope is not very meaningful. Instead, Figures 6 through 11 parses the data based on NOAA climate region to better evaluate nuances of the relationships between PM 2.5 concentration and climate variables. Notably, western regions (West, Northwest, and Southwest) have a smaller quantity of counties so they are grouped into one plot for the purposes of these visualizations.</p>
+<p>Cooling degree days does not appear to be have a significant relationship with PM 2.5 concentration in 2015, though there is a significant, moderately positive relationship between the two variables in the Upper Midwest.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -242,6 +267,7 @@ div.csl-indent {
 </div>
 </div>
 </div>
+<p>The correlations between PM 2.5 concentration and maximum temperature are significant positive in the Upper Midwest (R=0.68) and Northeast (R=0.5). Interestingly, in Ohio Valley the relationship is significant and moderately negative (R=-0.41). This indicates that in the Ohio Valley region, counties with lower maximum temperatures in 2015 also tended to have higher annual PM 2.5 levels. A visual inspection of the Ohio Valley plot reveals that there is a relatively wide range of maximum temperatures in the Ohio Valley region but a small and dense range of PM 2.5 concentrations in this area.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -252,6 +278,7 @@ div.csl-indent {
 </div>
 </div>
 </div>
+<p>Heating degree days and PM 2.5 concentrations show similar relationships in the Upper Midwest region (R=0.73) and Ohio Valley (R = -0.39). The two variables in both of these regions show a significant relationship, though in the Upper Midwest, that relationship is strongly positive, and in Ohio Valley, it is moderately negative. The other regions do not seem to have significant relationships.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -262,6 +289,7 @@ div.csl-indent {
 </div>
 </div>
 </div>
+<p>The Upper Midwest region and the South both show significant, positive relationships between minimum temperature and PM 2.5 concentration.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -272,6 +300,7 @@ div.csl-indent {
 </div>
 </div>
 </div>
+<p>Precipitation levels appear to have a significant and fairly strong positive relationship with PM 2.5 concentration in the South (R=0.69) and Northern Rockies (R=0.57). WAS THIS ANTICIPATED?</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -296,11 +325,18 @@ div.csl-indent {
 </div>
 </div>
 <div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<p>The below figures plot age-adjusted mortality rates (Figure X: All ages and Figure Y: 65 and over population only) against 2015 maximum temperatures by county. There is a significant, positive relationship in the Ohio Valley area, indicating that counties with higher maximum temperatures tended to have higher age-adjusted mortality rates. This positive relationship is lower in the 65 and over population.</p>
+<div class="cell">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="intro_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="1152"></p>
-<p></p><figcaption class="figure-caption">Figure 4; UPDATE CAPTION</figcaption><p></p>
+<p><img src="intro_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="1152"></p>
+<p></p><figcaption class="figure-caption">Figure 9; UPDATE CAPTION</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -309,8 +345,29 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="intro_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="1152"></p>
-<p></p><figcaption class="figure-caption">Figure 4; UPDATE CAPTION</figcaption><p></p>
+<p><img src="intro_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="1152"></p>
+<p></p><figcaption class="figure-caption">Figure 9; UPDATE CAPTION</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The next two figures plot age-adjusted mortality rates (Figure X: All ages and Figure Y: 65 and over population only) against 2015 precipitaion levels by county. There is a significant, positive relationship in both the South and Ohio Valley areas, indicating that counties with higher precipitation levels tended to have higher age-adjusted mortality rates. As with the maximum temperature findings, there positive relationships are lower in the 65 and over population.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="intro_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="1152"></p>
+<p></p><figcaption class="figure-caption">Figure 9; UPDATE CAPTION</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="intro_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="1152"></p>
+<p></p><figcaption class="figure-caption">Figure 9; UPDATE CAPTION</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -323,11 +380,13 @@ div.csl-indent {
 <p></p><figcaption class="figure-caption">NLCD Land Cover Types</figcaption><p></p>
 </figure>
 </div>
+<p>Land cover data are summarized into the following major classes: wetlands (woody and emergent herbaceous), planted (pasture, cultivated crops), herbaceous (grassland / herbaceous), shrubland (shrub/scrub), forest (deciduous, evergreen, and mixed forest), barren (barren land - rocks and clay), developed (low, mid, and high intensity development), and water (open water, perennial ice/snow). National county-level distribution of proportional land cover are displayed in FIGURE WHAT below. The planted (pasture, cultivated crops) and forest land cover types have even and long distributions, indicating that proportions of land dedicated to these land cover types vary widely by county and are not normally distributed. Other land cover types are closer to normal distributions. Notably, the first quartile of wetlands, herbaceous, shrubland, barren, and water are around 0%, indicating that around one quarter of counties in the contiguous U.S. are not at all represented by at least one of those land cover types.</p>
+<p>LONG TAILS</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="intro_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="intro_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
 <p></p><figcaption class="figure-caption">Figure 11; UPDATE CAPTION</figcaption><p></p>
 </figure>
 </div>
@@ -337,7 +396,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="intro_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="1344"></p>
+<p><img src="intro_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="1344"></p>
 <p></p><figcaption class="figure-caption">Figure 12; UPDATE CAPTION</figcaption><p></p>
 </figure>
 </div>
@@ -351,78 +410,84 @@ Entropy =
 \]</span></p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="intro_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+<p><img src="intro_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="intro_files/figure-html/unnamed-chunk-21-2.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Data are first approximated at a county level. Air quality data is captured by monitors, whose locations are indicated in the EPA’s data files. In order to spread air quality metrics over space, spatial interpolation is used (add specifications). Land cover data is also approximated at the county level by using R to quantify the area of major land cover types that are measured in each county.REMOVE?</p>
 <p>The dependent variable that is being used as a proxy for health is age-adjusted mortality rate for respiratory diseases. After a review of the dependent and independent variables, OLS regression models are consulted. The OLS regression model will estimate the effect of the independent variables on the dependent variable. Different combinations of variables are tested to evaluate what creates the best model, and results are evaluated for statistical significance.</p>
 <p>A linear regression model is then evaluated for spatial autocorrelation. The regression model depends on independence and heteroskedasticity of residuals. If spatial autocorrelation is present, then both rules are broken. Spatial autocorrelation is tested using the Global Moran’s I test, followed by mapping the Local Moran’s I. Spatial clustering is revealed by the Local Indicator of Spatial Association (LISA) map. The Lagrange Multiplier test is consulted to determine if spatial error or spatial lag is driving spatial autocorrelation in the model. Based on the Lagrange Multiplier results, the spatial [lag/error] model is used to try to produce a better model.</p>
+</section>
+<section id="results" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="results"><span class="header-section-number">1.3</span> Results</h2>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
 lm(formula = AAMR_all_ICDI_use ~ pct_white + pct_black + pct_hispanic + 
     pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + 
-    entropy + HDD + PCP, data = c_df6_a)
+    entropy + TMAX + PCP, data = c_df6_a)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--2.5382 -0.4207 -0.0241  0.3785  3.6923 
+-2.5598 -0.4144 -0.0191  0.3765  3.6638 
 
 Coefficients:
                 Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)   -3.145e-16  1.237e-02   0.000   1.0000    
-pct_white      1.313e-01  2.770e-02   4.741 2.22e-06 ***
-pct_black      2.856e-02  2.901e-02   0.984   0.3250    
-pct_hispanic  -2.008e-01  1.826e-02 -11.002  &lt; 2e-16 ***
-pct_bach      -2.595e-01  1.931e-02 -13.441  &lt; 2e-16 ***
-pct_pov        1.580e-01  2.148e-02   7.355 2.47e-13 ***
-PM2.5          2.026e-02  1.427e-02   1.420   0.1557    
-pct_smokers    2.350e-01  2.167e-02  10.845  &lt; 2e-16 ***
-pct_obese      1.252e-01  1.947e-02   6.430 1.49e-10 ***
-pct_uninsured  1.598e-02  1.843e-02   0.867   0.3861    
-entropy        3.873e-02  1.432e-02   2.704   0.0069 ** 
-HDD           -2.516e-01  1.976e-02 -12.737  &lt; 2e-16 ***
-PCP           -7.203e-02  1.742e-02  -4.135 3.65e-05 ***
+(Intercept)   -3.077e-16  1.234e-02   0.000   1.0000    
+pct_white      1.215e-01  2.764e-02   4.396 1.14e-05 ***
+pct_black      1.201e-02  2.916e-02   0.412   0.6805    
+pct_hispanic  -2.059e-01  1.825e-02 -11.278  &lt; 2e-16 ***
+pct_bach      -2.593e-01  1.926e-02 -13.461  &lt; 2e-16 ***
+pct_pov        1.597e-01  2.144e-02   7.451 1.22e-13 ***
+PM2.5          3.136e-02  1.407e-02   2.228   0.0259 *  
+pct_smokers    2.337e-01  2.162e-02  10.813  &lt; 2e-16 ***
+pct_obese      1.168e-01  1.946e-02   6.002 2.19e-09 ***
+pct_uninsured  5.809e-03  1.858e-02   0.313   0.7546    
+entropy        3.684e-02  1.430e-02   2.577   0.0100 *  
+TMAX           2.587e-01  1.944e-02  13.311  &lt; 2e-16 ***
+PCP           -4.170e-02  1.673e-02  -2.493   0.0127 *  
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 0.6705 on 2926 degrees of freedom
-Multiple R-squared:  0.5522,    Adjusted R-squared:  0.5504 
-F-statistic: 300.7 on 12 and 2926 DF,  p-value: &lt; 2.2e-16</code></pre>
+Residual standard error: 0.6689 on 2926 degrees of freedom
+Multiple R-squared:  0.5544,    Adjusted R-squared:  0.5526 
+F-statistic: 303.3 on 12 and 2926 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
 lm(formula = AAMR_all_ICDI65_use ~ pct_white + pct_black + pct_hispanic + 
     pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + 
-    entropy + HDD + PCP, data = c_df6_b)
+    entropy + TMAX + PCP, data = c_df6_b)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--3.0355 -0.4742 -0.0108  0.4233  4.6530 
+-3.0526 -0.4614 -0.0104  0.4196  4.6901 
 
 Coefficients:
                 Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)   -1.867e-16  1.410e-02   0.000 1.000000    
-pct_white      1.279e-01  3.158e-02   4.048 5.29e-05 ***
-pct_black     -2.729e-02  3.308e-02  -0.825 0.409393    
-pct_hispanic  -1.721e-01  2.081e-02  -8.270  &lt; 2e-16 ***
-pct_bach      -2.659e-01  2.201e-02 -12.078  &lt; 2e-16 ***
-pct_pov        9.325e-02  2.450e-02   3.807 0.000144 ***
-PM2.5          4.404e-02  1.627e-02   2.707 0.006826 ** 
-pct_smokers    2.037e-01  2.471e-02   8.245 2.47e-16 ***
-pct_obese      1.375e-01  2.220e-02   6.195 6.65e-10 ***
-pct_uninsured  5.059e-03  2.102e-02   0.241 0.809789    
-entropy        3.495e-02  1.633e-02   2.140 0.032412 *  
-HDD           -2.096e-01  2.253e-02  -9.307  &lt; 2e-16 ***
-PCP           -8.011e-02  1.986e-02  -4.033 5.64e-05 ***
+(Intercept)   -1.820e-16  1.409e-02   0.000 1.000000    
+pct_white      1.198e-01  3.157e-02   3.795 0.000151 ***
+pct_black     -4.006e-02  3.330e-02  -1.203 0.229065    
+pct_hispanic  -1.754e-01  2.085e-02  -8.412  &lt; 2e-16 ***
+pct_bach      -2.658e-01  2.200e-02 -12.084  &lt; 2e-16 ***
+pct_pov        9.438e-02  2.448e-02   3.856 0.000118 ***
+PM2.5          5.358e-02  1.607e-02   3.334 0.000865 ***
+pct_smokers    2.025e-01  2.468e-02   8.205 3.40e-16 ***
+pct_obese      1.308e-01  2.223e-02   5.885 4.42e-09 ***
+pct_uninsured -2.084e-03  2.122e-02  -0.098 0.921794    
+entropy        3.364e-02  1.633e-02   2.060 0.039440 *  
+TMAX           2.126e-01  2.220e-02   9.577  &lt; 2e-16 ***
+PCP           -5.436e-02  1.910e-02  -2.846 0.004465 ** 
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 0.7645 on 2926 degrees of freedom
-Multiple R-squared:  0.4179,    Adjusted R-squared:  0.4155 
-F-statistic: 175.1 on 12 and 2926 DF,  p-value: &lt; 2.2e-16</code></pre>
+Residual standard error: 0.7639 on 2926 degrees of freedom
+Multiple R-squared:  0.4189,    Adjusted R-squared:  0.4165 
+F-statistic: 175.8 on 12 and 2926 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -431,14 +496,14 @@ F-statistic: 175.1 on 12 and 2926 DF,  p-value: &lt; 2.2e-16</code></pre>
 data:  
 model: lm(formula = AAMR_all_ICDI_use ~ pct_white + pct_black +
 pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
-pct_uninsured + entropy + HDD + PCP, data = c_df6_a)
+pct_uninsured + entropy + TMAX + PCP, data = c_df6_a)
 weights: df_1a_wt4
 
-Moran I statistic standard deviate = 22.88, p-value &lt; 2.2e-16
+Moran I statistic standard deviate = 22.792, p-value &lt; 2.2e-16
 alternative hypothesis: greater
 sample estimates:
 Observed Moran I      Expectation         Variance 
-    0.2829361678    -0.0028447414     0.0001560063 </code></pre>
+    0.2818333341    -0.0028421004     0.0001560066 </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -447,14 +512,14 @@ Observed Moran I      Expectation         Variance
 data:  
 model: lm(formula = AAMR_all_ICDI_use ~ pct_white + pct_black +
 pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
-pct_uninsured + entropy + HDD + PCP, data = c_df6_a)
+pct_uninsured + entropy + TMAX + PCP, data = c_df6_a)
 weights: df_1a_wt6
 
-Moran I statistic standard deviate = 25.92, p-value &lt; 2.2e-16
+Moran I statistic standard deviate = 25.783, p-value &lt; 2.2e-16
 alternative hypothesis: greater
 sample estimates:
 Observed Moran I      Expectation         Variance 
-    0.2624987188    -0.0027549107     0.0001047241 </code></pre>
+    0.2610981732    -0.0027531172     0.0001047247 </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -463,14 +528,14 @@ Observed Moran I      Expectation         Variance
 data:  
 model: lm(formula = AAMR_all_ICDI_use ~ pct_white + pct_black +
 pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
-pct_uninsured + entropy + HDD + PCP, data = c_df6_a)
+pct_uninsured + entropy + TMAX + PCP, data = c_df6_a)
 weights: df_1a_wt10
 
-Moran I statistic standard deviate = 31.256, p-value &lt; 2.2e-16
+Moran I statistic standard deviate = 31.123, p-value &lt; 2.2e-16
 alternative hypothesis: greater
 sample estimates:
 Observed Moran I      Expectation         Variance 
-    2.436686e-01    -2.632575e-03     6.209815e-05 </code></pre>
+    2.426230e-01    -2.631815e-03     6.209894e-05 </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -479,14 +544,14 @@ Observed Moran I      Expectation         Variance
 data:  
 model: lm(formula = AAMR_all_ICDI65_use ~ pct_white + pct_black +
 pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
-pct_uninsured + entropy + HDD + PCP, data = c_df6_b)
+pct_uninsured + entropy + TMAX + PCP, data = c_df6_b)
 weights: df_1b_wt4
 
-Moran I statistic standard deviate = 18.739, p-value &lt; 2.2e-16
+Moran I statistic standard deviate = 18.725, p-value &lt; 2.2e-16
 alternative hypothesis: greater
 sample estimates:
 Observed Moran I      Expectation         Variance 
-    0.2312083561    -0.0028447414     0.0001560063 </code></pre>
+    0.2310341204    -0.0028421004     0.0001560066 </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -495,14 +560,14 @@ Observed Moran I      Expectation         Variance
 data:  
 model: lm(formula = AAMR_all_ICDI65_use ~ pct_white + pct_black +
 pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
-pct_uninsured + entropy + HDD + PCP, data = c_df6_b)
+pct_uninsured + entropy + TMAX + PCP, data = c_df6_b)
 weights: df_1b_wt6
 
-Moran I statistic standard deviate = 21.093, p-value &lt; 2.2e-16
+Moran I statistic standard deviate = 21.052, p-value &lt; 2.2e-16
 alternative hypothesis: greater
 sample estimates:
 Observed Moran I      Expectation         Variance 
-    0.2130990639    -0.0027549107     0.0001047241 </code></pre>
+    0.2126832684    -0.0027531172     0.0001047247 </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -511,26 +576,196 @@ Observed Moran I      Expectation         Variance
 data:  
 model: lm(formula = AAMR_all_ICDI65_use ~ pct_white + pct_black +
 pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
-pct_uninsured + entropy + HDD + PCP, data = c_df6_b)
+pct_uninsured + entropy + TMAX + PCP, data = c_df6_b)
 weights: df_1b_wt10
 
-Moran I statistic standard deviate = 26.365, p-value &lt; 2.2e-16
+Moran I statistic standard deviate = 26.339, p-value &lt; 2.2e-16
 alternative hypothesis: greater
 sample estimates:
 Observed Moran I      Expectation         Variance 
-    2.051312e-01    -2.632575e-03     6.209815e-05 </code></pre>
+    2.049251e-01    -2.631815e-03     6.209894e-05 </code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="intro_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+<p><img src="intro_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output-display">
-<p><img src="intro_files/figure-html/unnamed-chunk-18-2.png" class="img-fluid" width="672"></p>
+<p><img src="intro_files/figure-html/unnamed-chunk-22-2.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output-display">
-<p><img src="intro_files/figure-html/unnamed-chunk-18-3.png" class="img-fluid" width="672"></p>
+<p><img src="intro_files/figure-html/unnamed-chunk-22-3.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output-display">
-<p><img src="intro_files/figure-html/unnamed-chunk-18-4.png" class="img-fluid" width="672"></p>
+<p><img src="intro_files/figure-html/unnamed-chunk-22-4.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Lagrange multiplier diagnostics for spatial dependence
+
+data:  
+model: lm(formula = AAMR_all_ICDI_use ~ pct_white + pct_black +
+pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
+pct_uninsured + entropy + TMAX + PCP, data = c_df6_a)
+weights: df_1a_wt6
+
+LMerr = 640.83, df = 1, p-value &lt; 2.2e-16
+
+
+    Lagrange multiplier diagnostics for spatial dependence
+
+data:  
+model: lm(formula = AAMR_all_ICDI_use ~ pct_white + pct_black +
+pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
+pct_uninsured + entropy + TMAX + PCP, data = c_df6_a)
+weights: df_1a_wt6
+
+LMlag = 529.12, df = 1, p-value &lt; 2.2e-16
+
+
+    Lagrange multiplier diagnostics for spatial dependence
+
+data:  
+model: lm(formula = AAMR_all_ICDI_use ~ pct_white + pct_black +
+pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
+pct_uninsured + entropy + TMAX + PCP, data = c_df6_a)
+weights: df_1a_wt6
+
+RLMerr = 129.21, df = 1, p-value &lt; 2.2e-16
+
+
+    Lagrange multiplier diagnostics for spatial dependence
+
+data:  
+model: lm(formula = AAMR_all_ICDI_use ~ pct_white + pct_black +
+pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
+pct_uninsured + entropy + TMAX + PCP, data = c_df6_a)
+weights: df_1a_wt6
+
+RLMlag = 17.498, df = 1, p-value = 2.876e-05</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Lagrange multiplier diagnostics for spatial dependence
+
+data:  
+model: lm(formula = AAMR_all_ICDI65_use ~ pct_white + pct_black +
+pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
+pct_uninsured + entropy + TMAX + PCP, data = c_df6_b)
+weights: df_1b_wt6
+
+LMerr = 425.21, df = 1, p-value &lt; 2.2e-16
+
+
+    Lagrange multiplier diagnostics for spatial dependence
+
+data:  
+model: lm(formula = AAMR_all_ICDI65_use ~ pct_white + pct_black +
+pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
+pct_uninsured + entropy + TMAX + PCP, data = c_df6_b)
+weights: df_1b_wt6
+
+LMlag = 371.81, df = 1, p-value &lt; 2.2e-16
+
+
+    Lagrange multiplier diagnostics for spatial dependence
+
+data:  
+model: lm(formula = AAMR_all_ICDI65_use ~ pct_white + pct_black +
+pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
+pct_uninsured + entropy + TMAX + PCP, data = c_df6_b)
+weights: df_1b_wt6
+
+RLMerr = 61.257, df = 1, p-value = 4.996e-15
+
+
+    Lagrange multiplier diagnostics for spatial dependence
+
+data:  
+model: lm(formula = AAMR_all_ICDI65_use ~ pct_white + pct_black +
+pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese +
+pct_uninsured + entropy + TMAX + PCP, data = c_df6_b)
+weights: df_1b_wt6
+
+RLMlag = 7.8621, df = 1, p-value = 0.005048</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:errorsarlm(formula = AAMR_all_ICDI_use ~ pct_white + pct_black + 
+    pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + 
+    pct_obese + pct_uninsured + entropy + TMAX + PCP, data = c_df6_a, 
+    listw = df_1a_wt6)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.41943 -0.36483 -0.02810  0.30680  3.45336 
+
+Type: error 
+Coefficients: (asymptotic standard errors) 
+                Estimate Std. Error  z value  Pr(&gt;|z|)
+(Intercept)   -0.0077316  0.0230861  -0.3349  0.737699
+pct_white      0.0956331  0.0313730   3.0483  0.002302
+pct_black      0.0191086  0.0335553   0.5695  0.569041
+pct_hispanic  -0.1700550  0.0227900  -7.4618 8.527e-14
+pct_bach      -0.2724826  0.0194716 -13.9939 &lt; 2.2e-16
+pct_pov        0.1289781  0.0220322   5.8541 4.797e-09
+PM2.5          0.0224951  0.0181291   1.2408  0.214670
+pct_smokers    0.2340642  0.0255720   9.1531 &lt; 2.2e-16
+pct_obese      0.0917146  0.0202117   4.5377 5.687e-06
+pct_uninsured -0.0289085  0.0216476  -1.3354  0.181741
+entropy        0.0252766  0.0176441   1.4326  0.151977
+TMAX           0.2529525  0.0278478   9.0834 &lt; 2.2e-16
+PCP            0.0033382  0.0238185   0.1402  0.888541
+
+Lambda: 0.51698, LR test value: 442.02, p-value: &lt; 2.22e-16
+Asymptotic standard error: 0.022998
+    z-value: 22.48, p-value: &lt; 2.22e-16
+Wald statistic: 505.34, p-value: &lt; 2.22e-16
+
+Log likelihood: -2760.957 for error model
+ML residual variance (sigma squared): 0.36538, (sigma: 0.60447)
+Number of observations: 2939 
+Number of parameters estimated: 15 
+AIC: 5551.9, (AIC for lm: 5991.9)</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:errorsarlm(formula = AAMR_all_ICDI65_use ~ pct_white + pct_black + 
+    pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + 
+    pct_obese + pct_uninsured + entropy + TMAX + PCP, data = c_df6_b, 
+    listw = df_1b_wt6)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-2.522237 -0.427920 -0.020048  0.368868  4.640506 
+
+Type: error 
+Coefficients: (asymptotic standard errors) 
+                Estimate Std. Error  z value  Pr(&gt;|z|)
+(Intercept)   -0.0063033  0.0235823  -0.2673  0.789246
+pct_white      0.1164199  0.0358392   3.2484  0.001161
+pct_black     -0.0318607  0.0382916  -0.8321  0.405378
+pct_hispanic  -0.1305665  0.0256256  -5.0951 3.485e-07
+pct_bach      -0.2716274  0.0226651 -11.9844 &lt; 2.2e-16
+pct_pov        0.0742918  0.0256106   2.9008  0.003722
+PM2.5          0.0381840  0.0203113   1.8799  0.060117
+pct_smokers    0.2276427  0.0290061   7.8481 4.219e-15
+pct_obese      0.1055168  0.0234809   4.4937 6.999e-06
+pct_uninsured -0.0358208  0.0246634  -1.4524  0.146394
+entropy        0.0323404  0.0198802   1.6268  0.103786
+TMAX           0.2090248  0.0299812   6.9719 3.128e-12
+PCP           -0.0168437  0.0259605  -0.6488  0.516453
+
+Lambda: 0.44285, LR test value: 299.29, p-value: &lt; 2.22e-16
+Asymptotic standard error: 0.024924
+    z-value: 17.768, p-value: &lt; 2.22e-16
+Wald statistic: 315.71, p-value: &lt; 2.22e-16
+
+Log likelihood: -3222.456 for error model
+ML residual variance (sigma squared): 0.50729, (sigma: 0.71224)
+Number of observations: 2939 
+Number of parameters estimated: 15 
+AIC: 6474.9, (AIC for lm: 6772.2)</code></pre>
 </div>
 </div>
 <hr>
@@ -554,6 +789,9 @@ Bureau, US Census. n.d. <span>“SAHIE 2008 - 2020 Demographic and Income Model 
 </div>
 <div id="ref-cdcwond" class="csl-entry" role="doc-biblioentry">
 <span>“CDC WONDER.”</span> n.d. <a href="https://wonder.cdc.gov/">https://wonder.cdc.gov/</a>.
+</div>
+<div id="ref-climate" class="csl-entry" role="doc-biblioentry">
+<span>“Climate Prediction Center - Monitoring &amp; Data: Weekly &amp; Monthly Degree Day Summaries Explanation.”</span> n.d. <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/cdus/degree_days/ddayexp.shtml">https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/cdus/degree_days/ddayexp.shtml</a>.
 </div>
 <div id="ref-entwisle2007" class="csl-entry" role="doc-biblioentry">
 Entwisle, Barbara. 2007. <span>“Putting People into Place.”</span> <em>Demography</em> 44 (4): 687–703. <a href="https://doi.org/10.1353/dem.2007.0045">https://doi.org/10.1353/dem.2007.0045</a>.
@@ -585,6 +823,12 @@ O’Neill, Marie S., Michelle L. Bell, Nalini Ranjit, Luis A. Cifuentes, Dana Lo
 <div id="ref-simon2015" class="csl-entry" role="doc-biblioentry">
 Simon, Heather, Adam Reff, Benjamin Wells, Jia Xing, and Neil Frank. 2015. <span>“Ozone Trends Across the United States over a Period of Decreasing NOx and VOC Emissions.”</span> <em>Environmental Science &amp; Technology</em> 49 (1): 186–95. <a href="https://doi.org/10.1021/es504514z">https://doi.org/10.1021/es504514z</a>.
 </div>
+<div id="ref-spatial" class="csl-entry" role="doc-biblioentry">
+<span>“Spatial and Temporal Variation in PM2.5 Chemical Composition in the United States for Health Effects Studies.”</span> n.d. <a href="https://ehp.niehs.nih.gov/doi/epdf/10.1289/ehp.9621">https://ehp.niehs.nih.gov/doi/epdf/10.1289/ehp.9621</a>.
+</div>
+<div id="ref-tsangari2016" class="csl-entry" role="doc-biblioentry">
+Tsangari, H., A. K. Paschalidou, A. P. Kassomenos, S. Vardoulakis, C. Heaviside, K. E. Georgiou, and E. N. Yamasaki. 2016. <span>“Extreme Weather and Air Pollution Effects on Cardiovascular and Respiratory Hospital Admissions in Cyprus.”</span> <em>Science of The Total Environment</em> 542 (January): 247–53. <a href="https://doi.org/10.1016/j.scitotenv.2015.10.106">https://doi.org/10.1016/j.scitotenv.2015.10.106</a>.
+</div>
 <div id="ref-uninsure" class="csl-entry" role="doc-biblioentry">
 <span>“Uninsured.”</span> n.d. <a href="https://www.countyhealthrankings.org/explore-health-rankings/county-health-rankings-model/health-factors/clinical-care/access-to-care/uninsured">https://www.countyhealthrankings.org/explore-health-rankings/county-health-rankings-model/health-factors/clinical-care/access-to-care/uninsured</a>.
 </div>
@@ -602,6 +846,9 @@ Wong, Chit-Ming, Nuntavarn Vichit-Vadakan, Haidong Kan, and Zhengmin Qian. 2008.
 </div>
 <div id="ref-worldhealthassembly2015" class="csl-entry" role="doc-biblioentry">
 World Health Assembly, 68. 2015. <span>“Health and the Environment: Addressing the Health Impact of Air Pollution.”</span>
+</div>
+<div id="ref-zhang2017" class="csl-entry" role="doc-biblioentry">
+Zhang, Henian, Yuhang Wang, Tae-Won Park, and Yi Deng. 2017. <span>“Quantifying the Relationship Between Extreme Air Pollution Events and Extreme Weather Events.”</span> <em>Atmospheric Research</em> 188 (May): 64–79. <a href="https://doi.org/10.1016/j.atmosres.2016.11.010">https://doi.org/10.1016/j.atmosres.2016.11.010</a>.
 </div>
 </div>
 </section>
