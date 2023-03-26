@@ -3,7 +3,8 @@ mainfont: serif;
 execute:
   echo: false
   warning: false
-  freeze: true
+  freeze: auto
+#  cache: true
 bibliography: references.bib
 ---
 
@@ -80,6 +81,7 @@ This research focuses on particulate matter (PM) 2.5 measures from 2015, as capt
 Figure 1 plots the 2015 annual PM 2.5 measures across the contiguous U.S. to provide a geographic reference for monitor locations and start to visually represent the variation in PM 2.5 measurements by region. A visual inspection of Figure 1 reveals how monitors are distributed throughout each region and their individual readings. It is noted that monitors are highly concentrated in certain areas (for example, the New Jersey to Massachusetts area) and few and far between in others (for example, in the Western landlocked states). This observation leads to the acknowledgement of potential spatial bias: monitors are not normally distributed throughout space, therefore spatial bias may be introduced due to the distribution of data across the measurement areas. However, the level of spatial bias difficult to measure due to this model's use of CDC-modeled data.
 
 ```{r}
+#| cache: true
 #| fig-cap: Figure 1; Annual summary of air quality metrics by monitoring site from 2014 - 2016
 
 readRenviron("~/.Renviron") ## my census api key thru PSU census_api_key("eaaf0e3dde825849338015707f07974203e9ae94",install = TRUE, overwrite = TRUE)
@@ -186,6 +188,7 @@ One limitation of the air quality data used in this model is the use of annually
 TALK ABOUT HOW THIS YEAR COMPARES TO OTHER YEARS
 
 ```{r}
+#| cache: true
 #| fig-width: 10
 #| fig-height: 6
 #| fig-cap: Figure 2; County-level air pollution statistics. Region selection limited by availability of data
@@ -296,6 +299,7 @@ Climate can also impact health independently of its impact on air pollution. Res
 For ease of interpretation, climate data are summarized by NOAA climate region. Figure 3 is included as a reference to show which states are included in each region.
 
 ```{r}
+#| cache: true
 #load US map shapefile for climate regions map
 options(tigris_class = "sf")
 sts2<- tigris::states(cb=T, year = 2015)
@@ -1771,11 +1775,33 @@ c_prep6%>%
 
 ```
 
-Data are first approximated at a county level. Air quality data is captured by monitors, whose locations are indicated in the EPA's data files. In order to spread air quality metrics over space, spatial interpolation is used (add specifications). Land cover data is also approximated at the county level by using R to quantify the area of major land cover types that are measured in each county.REMOVE?
+INTRODUCTION ABOUT METHOD. The dependent variable that is being used as a proxy for health is age-adjusted mortality rate for respiratory diseases. As a first step, I run Ordinary Least Squares (OLS) regression model as a baseline to estimate the effect of the independent variables on the dependent variable.The multiple regression model for age-adjusted mortality rates due to cardiovascular and respiratory diseases are expressed as follows:
 
-The dependent variable that is being used as a proxy for health is age-adjusted mortality rate for respiratory diseases. After a review of the dependent and independent variables, OLS regression models are consulted. The OLS regression model will estimate the effect of the independent variables on the dependent variable. Different combinations of variables are tested to evaluate what creates the best model, and results are evaluated for statistical significance.
+$$
+Age Adjusted Mortality Rate = \beta_0+\beta_1*\%White+\beta_2*\%Hispanic+\beta_3*\%Education+\beta_4*\PM2.5+\beta_5*\%Smoker+\beta_6*\%Obese+\beta_7*\Entropy+\beta_8*\Temp_max+\beta_9*\Precipitation
+$$
+The regression model depends on independence and heteroskedasticity of residuals. If spatial autocorrelation is present, then both rules are broken. Spatial autocorrelation is tested using the Global Moran's I test, which is calculated as:
 
-A linear regression model is then evaluated for spatial autocorrelation. The regression model depends on independence and heteroskedasticity of residuals. If spatial autocorrelation is present, then both rules are broken. Spatial autocorrelation is tested using the Global Moran's I test, followed by mapping the Local Moran's I. Spatial clustering is revealed by the Local Indicator of Spatial Association (LISA) map. The Lagrange Multiplier test is consulted to determine if spatial error or spatial lag is driving spatial autocorrelation in the model. Based on the Lagrange Multiplier results, the spatial \[lag/error\] model is used to try to produce a better model.
+![Moran's I formula from Chapter 4](images/morans1.png){fig-alt="Need to replace this picture"}
+
+The Global Moran's I result is an indicator of spatial autocorrelation of the overall model. However, there may be spatial clustering present in certain pockets of the data.  Local patterns of spatial autocorrelation are visualized through Local Indicator of Spatial Association (LISA) maps and displayed in the Results section. To determine whether spatial lag or spatial error is driving spatial autocorrelation in the model, we consult the Lagrange Multiplier test. The Lagrange Multiplier results indicate that spatial error model is preferred over the spatial lag model.  
+
+The spatial error model is calculated as follows:
+$$
+Y = X'\beta+e
+$$
+$$
+e=\lambda W e+v
+$$
+
+The spatial error model is the evaluated to confirm if it is an improvement over the linear regression model.
+
+The next model tested is a Geographic Weighted Regression (GWR) model.  The GWR model accommodates variation in the relationship between variables over space.  GWR is calculated as:
+
+$$
+y_i = \beta_0i(u_i,v_i)+\sum_{n=i}^k\beta_ni(u_i,v_i)x_ni+\epsilon_i
+$$
+Bandwidth is important for the GWR model. I use an adaptive kernel model to determine the GWR model's bandwidth, which will accommodate differences between relative distances between counties to mitigate bias due to unevenly spaced data.
 
 ## Results
 
@@ -1783,7 +1809,7 @@ A linear regression model is then evaluated for spatial autocorrelation. The reg
 #prep data 
 health_c <- read_excel('data files/2016 county health v3.xlsx') 
 c_prep7<-left_join(c_prep6,health_c, by="cofips") 
-c_prep7<-subset(c_prep7,select=-c(75:77)) 
+c_prep7<-subset(c_prep7,select=-c(74,76:77)) 
 
 #drop unnecessary variables
 c_df <- subset(c_prep7, select = -c(13:18,25:27,29:31,33:35,37:39,41:43,45:47,49:50,55:64))
@@ -1805,16 +1831,51 @@ c_df1 <- c_df%>%
   
 c_df1 <- subset(c_df1,select=-c(4:11))
 
+#descriptive statistics of target data
+columns = c('AAMR_all_ICDI_use', 'AAMR_all_ICDI65_use','pct_white', 'pct_hispanic','pct_bach','pct_pov','PM2.5','pct_smokers','pct_obese','entropy_dev','TMAX','PCP')
+descrip = summary(c_df1[columns])
+
+#display summary stats
+descrip
+
+
+```
+
+```{r}
+#| cache: true
 
 # prep data for OLS model
 #removed rural... too many NAs... is there another source?
 #removing items not needed in model A & filter complete cases
 c_df2_a <-subset(c_df1,select=-c(2:5,7,9:11,13,15:29,34,38:40))%>%
-    filter(complete.cases(AAMR_all_ICDI_use,pct_white,pct_black,pct_hispanic,pct_bach,pct_pov,PM2.5,pct_smokers,pct_obese,pct_uninsured,entropy,TMAX,PCP))
+    filter(complete.cases(AAMR_all_ICDI_use,pct_white,
+#                          pct_black,
+                          pct_hispanic,
+                          pct_bach,
+                          pct_pov,
+                          PM2.5,
+                          pct_smokers,
+                          pct_obese,
+#                          pct_uninsured,
+                          entropy_dev,
+                          TMAX,
+                          PCP))
 
  #removing items not needed in model B & filter complete cases                              
 c_df2_b <-subset(c_df1,select=-c(2:6,9:11,13,15:29,34,38:40))%>%
-    filter(complete.cases(AAMR_all_ICDI65_use,pct_white,pct_black,pct_hispanic,pct_bach,pct_pov,PM2.5,pct_smokers,pct_obese,pct_uninsured,entropy,TMAX,PCP))
+    filter(complete.cases(AAMR_all_ICDI65_use,
+                          pct_white,
+#                          pct_black,
+                          pct_hispanic,
+                          pct_bach,
+                          pct_pov,
+                          PM2.5,
+                          pct_smokers,
+                          pct_obese,
+#                          pct_uninsured,
+                          entropy_dev,
+                          TMAX,
+                          PCP))
 
 #remove geometry
 c_df3_a <- c_df2_a%>%
@@ -1840,10 +1901,10 @@ c_df6_a[]<-lapply(c_df6_a,as.numeric)
 c_df6_b[]<-lapply(c_df6_b,as.numeric)
 
 #OLS model A
-fit_c_df_a<- lm(AAMR_all_ICDI_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy + TMAX + PCP, data = c_df6_a)
+fit_c_df_a<- lm(AAMR_all_ICDI_use ~ pct_white + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + entropy_dev + TMAX + PCP, data = c_df6_a)
 
 # #OLS model B
-fit_c_df_b<- lm(AAMR_all_ICDI65_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy + TMAX + PCP, data = c_df6_b)
+fit_c_df_b<- lm(AAMR_all_ICDI65_use ~ pct_white + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + entropy_dev + TMAX + PCP, data = c_df6_b)
 
 summary(fit_c_df_a)
 summary(fit_c_df_b)
@@ -1868,7 +1929,7 @@ coords_a10 <- coordinates(df_1_as)
 col.knn_a10 <- knearneigh(coords_a10, k = 10, longlat = T)
 df_1a_wt10 <- nb2listw(knn2nb(col.knn_a10), style = "W")
 
-lm.morantest(fit_c_df_a, listw = df_1a_wt4)
+#lm.morantest(fit_c_df_a, listw = df_1a_wt4)
 lm.morantest(fit_c_df_a, listw = df_1a_wt6)
 lm.morantest(fit_c_df_a, listw = df_1a_wt10)
 
@@ -1888,14 +1949,18 @@ coords_b10 <- coordinates(df_1_bs)
 col.knn_b10 <- knearneigh(coords_b10, k = 10, longlat = T)
 df_1b_wt10 <- nb2listw(knn2nb(col.knn_b10), style = "W")
 
-lm.morantest(fit_c_df_b, listw = df_1b_wt4)
+#lm.morantest(fit_c_df_b, listw = df_1b_wt4)
 lm.morantest(fit_c_df_b, listw = df_1b_wt6)
 lm.morantest(fit_c_df_b, listw = df_1b_wt10)
 
-#Mapping Model Residuals - Model A
-c_df2_a$rstudent <- rstudent(fit_c_df_a)
+#make copy c_df2
+c_ols1_a = c_df2_a
+c_ols1_b = c_df2_b
 
-c_df2_a%>%
+#Mapping Model Residuals - Model A
+c_ols1_a$rstudent <- rstudent(fit_c_df_a)
+
+c_ols1_a%>%
   ggplot(aes(fill = rstudent)) + 
   geom_sf() +
   ggtitle(label = "Distribution of Model Residuals", subtitle = "US Counties") + 
@@ -1906,36 +1971,36 @@ c_df2_a%>%
 # df_2_wtr <- nb2listw(df_2.nbr, style = "W")
 
 #Local Moran Cluster Map -- model residuals
-locali_r <- localmoran(c_df2_a$rstudent, listw = df_1a_wt6, alternative = "two.sided" )
-c_df2_a$locali_r <- locali_r[,1]
-c_df2_a$localp_r <- locali_r[,5]
+locali_r <- localmoran(c_ols1_a$rstudent, listw = df_1a_wt6, alternative = "two.sided" )
+c_ols1_a$locali_r <- locali_r[,1]
+c_ols1_a$localp_r <- locali_r[,5]
 
-c_df2_a$sinc_r <- scale(c_df2_a$rstudent)
-c_df2_a$lag_inc_r <- lag.listw(var=c_df2_a$sinc_r, x = df_1a_wt6)
-c_df2_a$quad_sig_r <- NA
-c_df2_a$quad_sig_r[(c_df2_a$sinc_r >= 0 & c_df2_a$lag_inc_r >= 0) & (c_df2_a$localp_r <= 0.05)] <- 1
-c_df2_a$quad_sig_r[(c_df2_a$sinc_r <= 0 & c_df2_a$lag_inc_r <= 0) & (c_df2_a$localp_r <= 0.05)] <- 2
-c_df2_a$quad_sig_r[(c_df2_a$sinc_r >= 0 & c_df2_a$lag_inc_r <= 0) & (c_df2_a$localp_r <= 0.05)] <- 3
-c_df2_a$quad_sig_r[(c_df2_a$sinc_r >= 0 & c_df2_a$lag_inc_r <= 0) & (c_df2_a$localp_r <= 0.05)] <- 4
-c_df2_a$quad_sig_r[(c_df2_a$sinc_r <= 0 & c_df2_a$lag_inc_r >= 0) & (c_df2_a$localp_r <= 0.05)] <- 5  
+c_ols1_a$sinc_r <- scale(c_ols1_a$rstudent)
+c_ols1_a$lag_inc_r <- lag.listw(var=c_ols1_a$sinc_r, x = df_1a_wt6)
+c_ols1_a$quad_sig_r <- NA
+c_ols1_a$quad_sig_r[(c_ols1_a$sinc_r >= 0 & c_ols1_a$lag_inc_r >= 0) & (c_ols1_a$localp_r <= 0.05)] <- 1
+c_ols1_a$quad_sig_r[(c_ols1_a$sinc_r <= 0 & c_ols1_a$lag_inc_r <= 0) & (c_ols1_a$localp_r <= 0.05)] <- 2
+c_ols1_a$quad_sig_r[(c_ols1_a$sinc_r >= 0 & c_ols1_a$lag_inc_r <= 0) & (c_ols1_a$localp_r <= 0.05)] <- 3
+c_ols1_a$quad_sig_r[(c_ols1_a$sinc_r >= 0 & c_ols1_a$lag_inc_r <= 0) & (c_ols1_a$localp_r <= 0.05)] <- 4
+c_ols1_a$quad_sig_r[(c_ols1_a$sinc_r <= 0 & c_ols1_a$lag_inc_r >= 0) & (c_ols1_a$localp_r <= 0.05)] <- 5  
 
 #assign breaks for the thematic map classes
 
 breaks <- seq(1, 5, 1)
-np_r <- findInterval(c_df2_a$quad_sig_r, breaks)
+np_r <- findInterval(c_ols1_a$quad_sig_r, breaks)
 
 # Assign colors
 
 labels <- c("High-High", "Low-Low", "High-Low", "Low-High", "Not Clustered")
 colors <- c("red", "blue", "lightpink", "skyblue2", "white")
 
-plot(c_df2_a['rstudent'], col = colors[np_r], main="Moran LISA Cluster Map - Model Residuals (KNN = 6)")
+plot(c_ols1_a['rstudent'], col = colors[np_r], main="Moran LISA Cluster Map - Model Residuals (KNN = 6)")
 legend("bottomright", legend = labels, fill = colors, bty = "n")
 
 #Mapping Model Residuals - Model B
-c_df2_b$rstudent <- rstudent(fit_c_df_b)
+c_ols1_b$rstudent <- rstudent(fit_c_df_b)
 
-c_df2_b%>%
+c_ols1_b%>%
   ggplot(aes(fill = rstudent)) + 
   geom_sf() +
   ggtitle(label = "Distribution of Model Residuals", subtitle = "US Counties") + 
@@ -1946,35 +2011,37 @@ c_df2_b%>%
 # df_2_wtr <- nb2listw(df_2.nbr, style = "W")
 
 #Local Moran Cluster Map -- model residuals
-locali_r <- localmoran(c_df2_b$rstudent, listw = df_1b_wt6, alternative = "two.sided" )
-c_df2_b$locali_r <- locali_r[,1]
-c_df2_b$localp_r <- locali_r[,5]
+locali_r <- localmoran(c_ols1_b$rstudent, listw = df_1b_wt6, alternative = "two.sided" )
+c_ols1_b$locali_r <- locali_r[,1]
+c_ols1_b$localp_r <- locali_r[,5]
 
-c_df2_b$sinc_r <- scale(c_df2_b$rstudent)
-c_df2_b$lag_inc_r <- lag.listw(var=c_df2_b$sinc_r, x = df_1b_wt6)
-c_df2_b$quad_sig_r <- NA
-c_df2_b$quad_sig_r[(c_df2_b$sinc_r >= 0 & c_df2_b$lag_inc_r >= 0) & (c_df2_b$localp_r <= 0.05)] <- 1
-c_df2_b$quad_sig_r[(c_df2_b$sinc_r <= 0 & c_df2_b$lag_inc_r <= 0) & (c_df2_b$localp_r <= 0.05)] <- 2
-c_df2_b$quad_sig_r[(c_df2_b$sinc_r >= 0 & c_df2_b$lag_inc_r <= 0) & (c_df2_b$localp_r <= 0.05)] <- 3
-c_df2_b$quad_sig_r[(c_df2_b$sinc_r >= 0 & c_df2_b$lag_inc_r <= 0) & (c_df2_b$localp_r <= 0.05)] <- 4
-c_df2_b$quad_sig_r[(c_df2_b$sinc_r <= 0 & c_df2_b$lag_inc_r >= 0) & (c_df2_b$localp_r <= 0.05)] <- 5  
+c_ols1_b$sinc_r <- scale(c_ols1_b$rstudent)
+c_ols1_b$lag_inc_r <- lag.listw(var=c_ols1_b$sinc_r, x = df_1b_wt6)
+c_ols1_b$quad_sig_r <- NA
+c_ols1_b$quad_sig_r[(c_ols1_b$sinc_r >= 0 & c_ols1_b$lag_inc_r >= 0) & (c_ols1_b$localp_r <= 0.05)] <- 1
+c_ols1_b$quad_sig_r[(c_ols1_b$sinc_r <= 0 & c_ols1_b$lag_inc_r <= 0) & (c_ols1_b$localp_r <= 0.05)] <- 2
+c_ols1_b$quad_sig_r[(c_ols1_b$sinc_r >= 0 & c_ols1_b$lag_inc_r <= 0) & (c_ols1_b$localp_r <= 0.05)] <- 3
+c_ols1_b$quad_sig_r[(c_ols1_b$sinc_r >= 0 & c_ols1_b$lag_inc_r <= 0) & (c_ols1_b$localp_r <= 0.05)] <- 4
+c_ols1_b$quad_sig_r[(c_ols1_b$sinc_r <= 0 & c_ols1_b$lag_inc_r >= 0) & (c_ols1_b$localp_r <= 0.05)] <- 5  
 
 #assign breaks for the thematic map classes
 
 breaks <- seq(1, 5, 1)
-np_r <- findInterval(c_df2_b$quad_sig_r, breaks)
+np_r <- findInterval(c_ols1_b$quad_sig_r, breaks)
 
 # Assign colors
 
 labels <- c("High-High", "Low-Low", "High-Low", "Low-High", "Not Clustered")
 colors <- c("red", "blue", "lightpink", "skyblue2", "white")
 
-plot(c_df2_b['rstudent'], col = colors[np_r], main="Moran LISA Cluster Map 65+ - Model Residuals (KNN = 6)")
+plot(c_ols1_b['rstudent'], col = colors[np_r], main="Moran LISA Cluster Map 65+ - Model Residuals (KNN = 6)")
 legend("bottomright", legend = labels, fill = colors, bty = "n")
 
 
 ```
+
 ```{r}
+#| cache: true
 fit_df2_a_tests <- lm.LMtests(fit_c_df_a, listw = df_1a_wt6,test = c("LMerr", "LMlag", "RLMerr", "RLMlag") )
 fit_df2_b_tests <- lm.LMtests(fit_c_df_b, listw = df_1b_wt6,test = c("LMerr", "LMlag", "RLMerr", "RLMlag") )
 
@@ -1982,15 +2049,141 @@ fit_df2_a_tests
 fit_df2_b_tests
 
 #higher value for Err than lag in both instances. Go with error model
-fit_df2_a_err <- errorsarlm(AAMR_all_ICDI_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy + TMAX + PCP, data = c_df6_a, listw = df_1a_wt6)
+fit_df2_a_err <- errorsarlm(AAMR_all_ICDI_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy_dev + TMAX + PCP, data = c_df6_a, listw = df_1a_wt6)
 
-fit_df2_b_err <- errorsarlm(AAMR_all_ICDI65_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy + TMAX + PCP, data = c_df6_b, listw = df_1b_wt6)
+fit_df2_b_err <- errorsarlm(AAMR_all_ICDI65_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy_dev + TMAX + PCP, data = c_df6_b, listw = df_1b_wt6)
 
 summary(fit_df2_a_err)
 summary(fit_df2_b_err)
 
-#evaluate compared to OLS model. Are Residual mean squared and AIC smaller? Smaller the better for both
+library(parallel)
+library(spgwr)
+library(rgdal)
 
+#make a copy of c_df2
+c_gwr1_a <-c_df2_a
+c_gwr1_b <-c_df2_b
+
+#scale numeric
+c_gwr1_a %>% mutate(across(where(is.numeric), scale))
+c_gwr1_b %>% mutate(across(where(is.numeric), scale))
+
+#make spatial
+c_gwr2_a <-as_Spatial(c_gwr1_a)
+c_gwr2_b <-as_Spatial(c_gwr1_b)
+
+#gwr.sel to determine bandwidth for gwr model
+gwr_a<-gwr.sel(AAMR_all_ICDI_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy_dev + TMAX + PCP ,adapt = T, data = c_gwr2_a)
+
+gwr_b<-gwr.sel(AAMR_all_ICDI65_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy_dev + TMAX + PCP ,adapt = T, data = c_gwr2_b)
+
+#now to fit GWR models
+cl<- makeCluster(detectCores()) #optional but faster
+# uscos <-as_Spatial(usco)
+# alt_coords <-coordinates(uscos)
+
+fit_a<-gwr(AAMR_all_ICDI_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy_dev + TMAX + PCP,
+         se.fit = T,
+         hatmatrix = T,
+         bandwidth = gwr_a,
+         cl = cl, #optional but faster
+         data=c_gwr2_a)
+
+fit_b<-gwr(AAMR_all_ICDI65_use ~ pct_white + pct_black + pct_hispanic + pct_bach + pct_pov + PM2.5 + pct_smokers + pct_obese + pct_uninsured + entropy_dev + TMAX + PCP,
+         se.fit = T,
+         hatmatrix = T,
+         bandwidth = gwr_b,
+         cl = cl, #optional but faster
+         data=c_gwr2_b)
+
+#output of GWR model; coefficients are statistics now rather than individual values
+fit_a
+fit_b
+
+#this function test the fit of the gwr model vs. ols. Look at p-value
+BFC02.gwr.test(fit_a)
+BFC02.gwr.test(fit_b)
+
+#convert to simple features
+gwr_out_a<-st_as_sf(fit_a$SDF)
+gwr_out_b<-st_as_sf(fit_b$SDF)
+
+
+#first map localR2 r-squared 
+gwr_out_a%>%  
+  mutate(R2=cut(localR2, breaks = quantile(localR2, p=seq(0,1, length.out = 9)), include.lowest = T))%>%
+  ggplot()+
+  geom_sf(aes( fill=R2, group=R2), color=NA)+
+  coord_sf(crs = 2163)+
+  scale_colour_viridis_d()+
+  scale_fill_viridis_d()+
+  geom_sf(data=sts, color="black")+
+  guides(fill=guide_legend(title="Parameter Estimate"))+
+  ggtitle(label = "Local R-Squared of Model A", subtitle = " Fixed Bandwidth")
+
+gwr_out_a%>%
+  mutate(PM2.5_sig = ifelse(abs(PM2.5/PM2.5_se)<1.96, NA,PM2.5/PM2.5_se)) %>%
+  mutate(PM2.5_sig_cut=cut(PM2.5_sig, breaks = quantile(PM2.5_sig, p=seq(0,1, length.out = 9), na.rm=T), include.lowest = T))%>%
+  ggplot()+
+  geom_sf(aes( fill=PM2.5_sig_cut, group=PM2.5_sig_cut), color=NA)+
+  scale_colour_viridis_d(na.value="white")+
+  scale_fill_viridis_d(na.value="white")+
+  guides(fill=guide_legend(title="t-value"))+
+  geom_sf(data=sts, color="black")+
+  coord_sf(coords)+
+  ggtitle(label = "Local t statistics for PM2.5 Concentration Effect from GWR Model", subtitle = 
+            "Fixed Kernel - NA is Not Sigificant")
+
+gwr_out_a%>%
+  mutate(TMAX_sig = ifelse(abs(TMAX/TMAX_se)<1.96, NA,TMAX/TMAX_se)) %>%
+  mutate(TMAX_sig_cut=cut(TMAX_sig, breaks = quantile(TMAX_sig, p=seq(0,1, length.out = 9), na.rm=T), include.lowest = T))%>%
+  ggplot()+
+  geom_sf(aes( fill=TMAX_sig_cut, group=TMAX_sig_cut), color=NA)+
+  scale_colour_viridis_d(na.value="white")+
+  scale_fill_viridis_d(na.value="white")+
+  guides(fill=guide_legend(title="t-value"))+
+  geom_sf(data=sts, color="black")+
+  coord_sf(coords)+
+  ggtitle(label = "Local t statistics for Max Temp Effect from GWR Model", subtitle = 
+            "Fixed Kernel - NA is Not Sigificant")
+
+#Model B
+gwr_out_b%>%  
+  mutate(R2=cut(localR2, breaks = quantile(localR2, p=seq(0,1, length.out = 9)), include.lowest = T))%>%
+  ggplot()+
+  geom_sf(aes( fill=R2, group=R2), color=NA)+
+  coord_sf(crs = 2163)+
+  scale_colour_viridis_d()+
+  scale_fill_viridis_d()+
+  geom_sf(data=sts, color="black")+
+  guides(fill=guide_legend(title="Parameter Estimate"))+
+  ggtitle(label = "Local R-Squared of Model B", subtitle = " Fixed Bandwidth")
+
+gwr_out_b%>%
+  mutate(PM2.5_sig = ifelse(abs(PM2.5/PM2.5_se)<1.96, NA,PM2.5/PM2.5_se)) %>%
+  mutate(PM2.5_sig_cut=cut(PM2.5_sig, breaks = quantile(PM2.5_sig, p=seq(0,1, length.out = 9), na.rm=T), include.lowest = T))%>%
+  ggplot()+
+  geom_sf(aes( fill=PM2.5_sig_cut, group=PM2.5_sig_cut), color=NA)+
+  scale_colour_viridis_d(na.value="white")+
+  scale_fill_viridis_d(na.value="white")+
+  guides(fill=guide_legend(title="t-value"))+
+  geom_sf(data=sts, color="black")+
+  coord_sf(coords)+
+  ggtitle(label = "Local t statistics for PM2.5 Concentration Effect from GWR Model", subtitle = 
+            "Fixed Kernel - NA is Not Sigificant")
+
+gwr_out_b%>%
+  mutate(TMAX_sig = ifelse(abs(TMAX/TMAX_se)<1.96, NA,TMAX/TMAX_se)) %>%
+  mutate(TMAX_sig_cut=cut(TMAX_sig, breaks = quantile(TMAX_sig, p=seq(0,1, length.out = 9), na.rm=T), include.lowest = T))%>%
+  ggplot()+
+  geom_sf(aes( fill=TMAX_sig_cut, group=TMAX_sig_cut), color=NA)+
+  scale_colour_viridis_d(na.value="white")+
+  scale_fill_viridis_d(na.value="white")+
+  guides(fill=guide_legend(title="t-value"))+
+  geom_sf(data=sts, color="black")+
+  coord_sf(coords)+
+  ggtitle(label = "Local t statistics for Max Temp Effect from GWR Model", subtitle = 
+            "Fixed Kernel - NA is Not Sigificant")
 ```
 
 ------------------------------------------------------------------------
